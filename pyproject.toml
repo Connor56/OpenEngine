@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "openengine"
+version = "0.1.0"
+description = ""
+authors = ["Connor Skelland <34070858+Connor56@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+scrapy = "^2.11.2"
+aiohttp = "^3.9.5"
+beautifulsoup4 = "^4.12.3"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
