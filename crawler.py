@@ -23,3 +23,25 @@ class AsyncList:
             return None
 
 
+def pattern_filter(
+    urls: List[str],
+    regex_patterns: List[str],
+) -> List[str]:
+    """
+    Searches a list of urls for regular expression patterns and keeps
+    only those that match one of the patterns. This is a whitelist
+    style pattern matching function.
+    """
+    regex_patterns = [re.compile(pattern) for pattern in regex_patterns]
+    filtered_urls = []
+    for url in urls:
+        for pattern in regex_patterns:
+            match = pattern.search(url)
+            if match is not None:
+                filtered_urls.append(url)
+                break
+
+    print("these are the filtered urls:", filtered_urls)
+    return filtered_urls
+
+
