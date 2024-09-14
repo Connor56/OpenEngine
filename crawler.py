@@ -150,3 +150,24 @@ async def crawler(
                 seen_urls.append(url)
 
 
+def clean_urls(
+    urls,
+):
+    """
+    Cleans a list of urls by removing fragments and trailing slashes,
+    and adds them to a set to ensure no duplicates. Returns these
+    urls.
+    """
+    cleaned_urls = set()
+
+    # Remove fragments and trailing slashes
+    for url in urls:
+        parsed_url = urlparse(url)
+
+        cleaned_url = parsed_url._replace(fragment="")
+
+        final_url = urlunparse(cleaned_url).rstrip("/")
+
+        cleaned_urls.add(final_url)
+
+    return list(cleaned_urls)
