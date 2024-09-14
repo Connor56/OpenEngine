@@ -23,7 +23,7 @@ class AsyncList:
 
     async def get_all(self):
         async with self._lock:
-            return list(self._list)  # Return a copy of the list
+            return list(self._list)
 
     async def pop(self):
         async with self._lock:
@@ -61,8 +61,8 @@ async def crawler(
     response_queue: asyncio.Queue,
     pause: asyncio.Event,
     end: asyncio.Event,
-    max_iter: Optional[int] = -1,
     seen_urls: Optional[AsyncList] = [],
+    max_iter: Optional[int] = -1,
 ) -> None:
     """
     Simple asynchronous crawling function that continuously reads
@@ -92,13 +92,13 @@ async def crawler(
     end : asyncio.Event
         Ends the crawler's while loop.
 
-    max_iter : int, optional
-        The maximum number of iterations to run the crawler for.
-
     seen_urls : AsyncList, optional
         The list of urls that have already been crawled. This is
         used to prevent crawling the same url multiple times. It can
         be shared across multiple crawlers.
+
+    max_iter : int, optional
+        The maximum number of iterations to run the crawler for.
     """
     num_iter = 0
     while not pause.is_set():
