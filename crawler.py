@@ -1,7 +1,7 @@
 """
 Description:
-    This module contains the crawler function and other functions
-    used to assist in asynchronous crawling.
+    Crawler function and other functions used to assist in
+    asynchronous crawling. 
 
 Created:
     2024-09-14
