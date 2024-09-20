@@ -11,7 +11,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 
 
-def store_data(
+async def store_embedding(
     vector: List[float] | List[List[float]],
     metadata: Dict[str, Any] | List[Dict[str, Any]],
     db_client: QdrantClient,
@@ -42,22 +42,37 @@ def store_data(
     ValueError
         If the length of the vector and metadata are not equal.
     """
+    # Vector and metadata must be lists for for loop
+    if not isinstance(vector, list):
+        vector = [vector]
+
+    if not isinstance(metadata, list):
+        metadata = [metadata]
+
     if len(vector) != len(metadata):
         raise ValueError("Vector and metadata must be the same length.")
 
+    # Store embedded vectors and metadata in qdrant
+    points = []
+    for idx, vector in enumerate(vector):
+
+        points.append(
+            PointStruct(
+                id=idx,
+                vector=vector.tolist(),
+                payload={"text": metadata[idx]},
+            )
+        )
+    
     try:
         db_client.upsert(
-            collection_name="my_collection",
-            points=[
-                PointStruct(
-                    id=idx,
-                    vector=vector.tolist(),
-                    payload={"text": sequences[idx]},
-                )
-                for idx, vector in enumerate(vectors)
-            ],
+            collection_name="embeddings",
+            points=points
         )
-        return True
+        
     except Exception as e:
         print(e)
+
         return False
+
+    return True
