@@ -13,7 +13,13 @@ import numpy as np
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 import sentence_transformers
+from dataclasses import dataclass
 
+@dataclass
+class Response:
+    type: str
+    soup: BeautifulSoup
+    url: str
 
 def extract_visible_text(soup):
     # Remove elements that do not contain user-visible text
