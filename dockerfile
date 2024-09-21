@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     && echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
+    && apt-get install -y vim \
     && apt-get install -y postgresql-14 postgresql-client-14 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,5 +30,12 @@ ENV POSTGRES_DB=openengine_db
 # Copy initialization script
 COPY init-postgres.sh /docker-entrypoint-initdb.d/
 
-# Start Qdrant and PostgreSQL
-CMD ["bash", "-c", "service postgresql start && qdrant"]
+# Copy the custom entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Start Qdrant in the foreground
+# CMD ["./entrypoint.sh"]
+
+# Start PostgreSQL in the background
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
