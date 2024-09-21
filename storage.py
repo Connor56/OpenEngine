@@ -9,10 +9,11 @@ Created:
 from typing import List, Dict, Any
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
+import numpy as np
 
 
 async def store_embedding(
-    vector: List[float] | List[List[float]],
+    vector: np.ndarray | List[np.ndarray],
     metadata: Dict[str, Any] | List[Dict[str, Any]],
     db_client: QdrantClient,
 ) -> bool:
@@ -56,6 +57,7 @@ async def store_embedding(
     points = []
     for idx, vector in enumerate(vector):
 
+        # Create a qdrant point struct
         points.append(
             PointStruct(
                 id=idx,
@@ -64,12 +66,13 @@ async def store_embedding(
             )
         )
     
+    # Store points in qdrant
     try:
         db_client.upsert(
             collection_name="embeddings",
             points=points
         )
-        
+
     except Exception as e:
         print(e)
 
