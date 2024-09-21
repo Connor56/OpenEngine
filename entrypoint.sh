@@ -14,4 +14,3 @@ done
 # Start Qdrant
 echo "Starting Qdrant..."
 exec ./qdrant
-# exec /usr/local/bin/entrypoint.sh qdrant
