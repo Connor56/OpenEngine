@@ -10,6 +10,14 @@ from typing import List, Dict, Any
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 import numpy as np
+from dataclasses import dataclass
+@dataclass
+class Resource:
+    url: str
+    firstVisited: datetime
+    lastVisited: datetime
+    allVisits: int
+    externalLinks: List[str]
 
 
 async def store_embedding(
@@ -79,3 +87,5 @@ async def store_embedding(
         return False
 
     return True
+
+
