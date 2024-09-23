@@ -9,7 +9,7 @@ EOSQL
 
 # Connect to the newly created database and create the URLVisits table
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE TABLE locations (q
+    CREATE TABLE resources (
         id SERIAL PRIMARY KEY,
         url VARCHAR(2048) NOT NULL,
         firstVisited TIMESTAMPTZ NOT NULL,
