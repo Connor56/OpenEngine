@@ -48,7 +48,7 @@ async def test_store_embedding():
 
 
 @pytest.mark.asyncio
-async def test_log_resource():
+async def test_log_resource(postgres_client):
     """
     Checks that the log_resource function correctly logs information
     about a searched resource to the postgres database.
@@ -63,29 +63,11 @@ async def test_log_resource():
         externalLinks=[],
     )
 
+    # Get the postgres client
+    db_client, stop, temp_dir = postgres_client
+
     try:
-        print("starting postgres")
-        temp_dir, port = start_ephemeral_postgres()
-        db_client = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            host="localhost",
-            port=port
-        )
-        print("connected to postgres")
-
-        # Create the table
-        table_sql = """CREATE TABLE resources ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        firstVisited TIMESTAMPTZ NOT NULL,
-        lastVisited TIMESTAMPTZ NOT NULL,
-        allVisits INT DEFAULT 1,
-        externalLinks TEXT[]
-        );"""
-
         cursor = db_client.cursor()
-        cursor.execute(table_sql)
 
         # Log the resource
         await st.log_resource(resource, db_client)
@@ -104,4 +86,4 @@ async def test_log_resource():
 
     finally:
         print("cleaning up")
-        stop_ephemeral_postgres(temp_dir)
+        stop(temp_dir)
