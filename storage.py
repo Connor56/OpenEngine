@@ -27,7 +27,7 @@ class Resource:
 async def store_embedding(
     vector: np.ndarray | List[np.ndarray],
     metadata: Dict[str, Any] | List[Dict[str, Any]],
-    db_client: QdrantClient,
+    vector_client: QdrantClient,
 ) -> bool:
     """
     Stores data in the qdrant database.
@@ -42,7 +42,7 @@ async def store_embedding(
         The metadata to store with the vector. Length must be equal
         to the number of vectors.
 
-    db_client : QdrantClient
+    vector_client : QdrantClient
         The Qdrant client to use for storing the data.
 
     Returns
@@ -80,7 +80,7 @@ async def store_embedding(
     
     # Store points in qdrant
     try:
-        db_client.upsert(
+        vector_client.upsert(
             collection_name="embeddings",
             points=points
         )
@@ -130,7 +130,7 @@ async def log_resource(
             "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
             attributes,
         )
-        
+
         return True
     except Exception as e:
         print(e)
