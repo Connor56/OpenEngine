@@ -19,6 +19,7 @@ from storage import store_embedding, Resource, log_resource
 import asyncio
 from psycopg2.extensions import connection
 from datetime import datetime
+from urllib.parse import urlparse
 
 
 @dataclass
@@ -153,3 +154,23 @@ def extract_visible_text(soup):
     ).strip()  # Replaces multiple spaces/newlines with a single space
 
     return visible_text
+
+
+def get_base_site(
+    url: str,
+) -> str:
+    """
+    Extracts the base site location from an U
+
+    Parameters
+    ----------
+    url : str
+        The URL to extract the base URL from.
+
+    Returns
+    -------
+    str
+        The base URL.
+    """
+    parsed_url = urlparse(url)
+    return parsed_url.scheme + "://" + parsed_url.netloc
