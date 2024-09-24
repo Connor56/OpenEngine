@@ -7,12 +7,11 @@ Created:
     2024-09-19
 """
 
-import crawler
 from qdrant_client import QdrantClient
 import sentence_transformers
 import psycopg2
 import asyncio
-from crawler import AsyncList, pattern_filter, crawler
+from crawl import AsyncList, pattern_filter, crawler
 from process import process_html_to_vectors, process
 
 

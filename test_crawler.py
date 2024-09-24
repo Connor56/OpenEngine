@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 import httpx
-import crawler
+import crawl
 
 
 def test_crawler():
@@ -34,10 +34,10 @@ async def test_crawler_link_filter(mocker):
     await url_queue.put("https://caseyhandmer.wordpress.com/")
 
     async with httpx.AsyncClient() as client:
-        await crawler.crawler(
+        await crawl.crawler(
             url_queue,
             url_filter={
-                "filter_func": crawler.pattern_filter,
+                "filter_func": crawl.pattern_filter,
                 "kwargs": {"regex_patterns": ["https://"]},
             },
             client=client,
@@ -81,10 +81,10 @@ async def test_crawler_seen_urls(mocker):
     await url_queue.put("https://caseyhandmer.wordpress.com/")
 
     async with httpx.AsyncClient() as client:
-        await crawler.crawler(
+        await crawl.crawler(
             url_queue,
             url_filter={
-                "filter_func": crawler.pattern_filter,
+                "filter_func": crawl.pattern_filter,
                 "kwargs": {"regex_patterns": ["https://"]},
             },
             client=client,
@@ -114,7 +114,7 @@ def test_clean_urls():
         "https://example.com/#example/example",
     ]
 
-    cleaned_urls = crawler.clean_urls(urls)
+    cleaned_urls = crawl.clean_urls(urls)
 
     assert len(cleaned_urls) == 2
     assert set(cleaned_urls) == set([
