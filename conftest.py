@@ -110,3 +110,20 @@ def populated_postgres_client():
         stop_ephemeral_postgres(temp_dir)
 
 
+@pytest.fixture(scope="function")
+def vector_client():
+    """
+    A fixture that provides a Qdrant client with the embeddings collection
+    for testing.
+    """
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import VectorParams, Distance
+
+    client = QdrantClient(":memory:")
+    client.create_collection(
+        collection_name="embeddings",
+        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+    )
+    return client
+
+
