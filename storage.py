@@ -25,7 +25,7 @@ class Resource:
 
 
 async def store_embedding(
-    vector: np.ndarray | List[np.ndarray],
+    vector: np.ndarray | List[np.ndarray] | List[float] | List[List[float]],
     metadata: Dict[str, Any] | List[Dict[str, Any]],
     vector_client: QdrantClient,
 ) -> bool:
@@ -34,7 +34,7 @@ async def store_embedding(
 
     Parameters
     ----------
-    vector : List[float] | List[List[float]]
+    vector : np.ndarray | List[np.ndarray]
         The vector or vectors to store. Length must be equal to the
         number of metadata items.
 
@@ -73,7 +73,7 @@ async def store_embedding(
         points.append(
             PointStruct(
                 id=idx,
-                vector=vector.tolist(),
+                vector=vector.tolist() if isinstance(vector, np.ndarray) else vector,
                 payload={"text": metadata[idx]},
             )
         )
@@ -98,7 +98,8 @@ async def log_resource(
     db_client: psycopg2.extensions.connection,
 ) -> bool:
     """
-    Logs information about a resource to the postgres database.
+    Logs information about a resource to the postgres database, if it isn't already
+    present.
 
     Parameters
     ----------
