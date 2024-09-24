@@ -14,6 +14,9 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 import sentence_transformers
 from dataclasses import dataclass
+from typing import Optional
+from storage import store_embedding
+
 
 @dataclass
 class Response:
@@ -22,7 +25,15 @@ class Response:
     url: str
 
 
-async def process(response_queue, model, vector_client, pause, end):
+async def process(
+    response_queue,
+    model,
+    vector_client,
+    db_client,
+    pause,
+    end,
+    max_iter: Optional[int] = -1,
+):
     """
     Processes responses collected by the crawler, turning them into
     embeddings, and other metadata used for searching.
