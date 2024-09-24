@@ -22,6 +22,7 @@ async def gather(
     db_client: psycopg2.extensions.connection,
     model: sentence_transformers.SentenceTransformer,
     revisit_delta: datetime.timedelta = datetime.timedelta(days=1),
+    max_iter: int = -1,
 ):
     """
     Sets up the queues for the crawler and processor and starts the
@@ -43,6 +44,11 @@ async def gather(
         The delta to use for revisiting a resource. Defaults to 1 day.
         This is based on the lastVisited attribute of the resources
         taken from the postgres database.
+
+    max_iter : int, optional
+        The maximum number of iterations to run the crawler and
+        processor for. Defaults to -1, which means run indefinitely.
+        This is for testing purposes.
     """
 
     # Create a queue for the crawler
@@ -94,5 +100,5 @@ async def gather(
         pause=pause,
         end=end,
         seen_urls=seen_urls,
-        max_iter=1,
+        max_iter=max_iter,
     )
