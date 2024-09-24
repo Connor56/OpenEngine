@@ -2,7 +2,7 @@ import pytest
 
 
 @pytest.fixture(scope="function")
-def postgres_client():
+def empty_postgres_client():
     """
     A fixture that provides a psycopg2 client for testing and a the function for killing
     the server once the user is complete.
@@ -38,10 +38,17 @@ def postgres_client():
 
         cursor.execute(table_sql)
 
+        yield client
+
+        client.close()
+
     except Exception as e:
         print(e)
+        stop_ephemeral_postgres(temp_dir)
+
+    finally:
         print("cleaning up")
 
         stop_ephemeral_postgres(temp_dir)
 
-    return (client, stop_ephemeral_postgres, temp_dir)
+
