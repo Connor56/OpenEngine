@@ -48,3 +48,12 @@ async def test_process(embedding_model, soup, vector_client, empty_postgres_clie
     assert len(results[0][5]) == 6
 
 
+def test_get_base_site():
+    """
+    Test the get_base_site function correctly extracts the base site
+    from a URL.
+    """
+    base_site = process.get_base_site("https://caseyhandmer.wordpress.com/some/random/path#an_id")
+    expected_base_site = "https://caseyhandmer.wordpress.com"
+    assert base_site == expected_base_site
+
