@@ -13,7 +13,7 @@ import sentence_transformers
 import psycopg2
 import asyncio
 from crawler import AsyncList, pattern_filter, crawler
-from process import process_html_to_vectors
+from process import process_html_to_vectors, process
 
 
 async def gather(
@@ -54,14 +54,14 @@ async def gather(
     seen_urls = AsyncList()
 
     # Create a crawler coroutine
-    asyncio.create_task(process_html_to_vectors(response_queue, model, vector_client))
+    asyncio.create_task(process(response_queue, model, vector_client))
     await crawler(
         url_queue,
         url_filter={
             "filter_func": pattern_filter,
             "kwargs": {"regex_patterns": ["https://"]},
         },
-        client=client,
+        client=vector_client, 
         response_queue=response_queue,
         pause=pause_crawling,
         end=stop_crawling,
