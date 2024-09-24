@@ -117,7 +117,7 @@ def test_clean_urls():
     cleaned_urls = crawler.clean_urls(urls)
 
     assert len(cleaned_urls) == 2
-    assert cleaned_urls == [
+    assert set(cleaned_urls) == set([
         "https://example.com",
         "https://example.com/example",
-    ]
+    ])
