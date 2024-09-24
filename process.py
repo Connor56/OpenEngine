@@ -27,12 +27,12 @@ class Response:
 
 
 async def process(
-    response_queue,
-    model,
-    vector_client,
-    db_client,
-    pause,
-    end,
+    response_queue: asyncio.Queue,
+    model: sentence_transformers.SentenceTransformer,
+    vector_client: QdrantClient,
+    db_client: connection,
+    pause: asyncio.Event,
+    end: asyncio.Event,
     max_iter: Optional[int] = -1,
 ):
     """
