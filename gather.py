@@ -14,6 +14,7 @@ import asyncio
 from crawl import AsyncList, pattern_filter, crawler
 from process import process_html_to_vectors, process
 import datetime
+import httpx
 
 
 async def gather(
@@ -59,6 +60,9 @@ async def gather(
     # Create a list to store seen urls
     seen_urls = AsyncList()
 
+    # Create an httpx client
+    client = httpx.AsyncClient()
+
     # Get all the urls from the postgres database
     cursor = db_client.cursor()
     cursor.execute("SELECT url, lastVisited FROM resources")
@@ -85,7 +89,7 @@ async def gather(
             "filter_func": pattern_filter,
             "kwargs": {"regex_patterns": ["https://"]},
         },
-        client=vector_client, 
+        client=client,
         response_queue=response_queue,
         pause=pause_crawling,
         end=stop_crawling,
