@@ -138,7 +138,22 @@ async def process_html_to_vectors(
     return vectors, metadata
 
 
-def extract_visible_text(soup):
+def extract_visible_text(
+    soup: BeautifulSoup,
+):
+    """
+    Extracts the visible text fro a webpage that's stored as a BeautifulSoup object.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        The BeautifulSoup object to extract the visible text from.
+
+    Returns
+    -------
+    str
+        The visible text.
+    """
     # Remove elements that do not contain user-visible text
     for element in soup(
         ["script", "style", "meta", "header", "footer", "nav", "noscript"]
