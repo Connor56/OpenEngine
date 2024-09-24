@@ -87,8 +87,20 @@ async def gather(
     for url in remaining_urls:
         await seen_urls.append(url)
 
+    # Create a process coroutine
+    task = asyncio.create_task(
+        process(
+            response_queue,
+            model,
+            vector_client,
+            db_client,
+            pause,
+            end,
+            max_iter=max_iter,
+        )
+    )
+
     # Create a crawler coroutine
-    asyncio.create_task(process(response_queue, model, vector_client))
     await crawler(
         url_queue,
         url_filter={
@@ -102,3 +114,7 @@ async def gather(
         seen_urls=seen_urls,
         max_iter=max_iter,
     )
+
+    # Wait for the process coroutine to finish
+    end.set()
+    await task
