@@ -82,8 +82,8 @@ def populated_postgres_client():
         table_sql = """CREATE TABLE resources ( 
             id SERIAL PRIMARY KEY,
             url VARCHAR(2048) NOT NULL,
-            firstVisited TIMESTAMPTZ NOT NULL,
-            lastVisited TIMESTAMPTZ NOT NULL,
+            firstVisited TIMESTAMP NOT NULL,
+            lastVisited TIMESTAMP NOT NULL,
             allVisits INT DEFAULT 1,
             externalLinks TEXT[]
         );"""

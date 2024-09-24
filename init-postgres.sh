@@ -12,8 +12,8 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE TABLE resources (
         id SERIAL PRIMARY KEY,
         url VARCHAR(2048) NOT NULL,
-        firstVisited TIMESTAMPTZ NOT NULL,
-        lastVisited TIMESTAMPTZ NOT NULL,
+        firstVisited TIMESTAMP NOT NULL,
+        lastVisited TIMESTAMP NOT NULL,
         allVisits INT DEFAULT 1,
         externalLinks TEXT[]
     );
