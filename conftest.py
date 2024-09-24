@@ -127,3 +127,13 @@ def vector_client():
     return client
 
 
+@pytest.fixture(scope="session")
+def embedding_model():
+    """
+    A fixture that provides a sentence_transformers model for testing.
+    """
+    import sentence_transformers
+
+    return sentence_transformers.SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
+
+
