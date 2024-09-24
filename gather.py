@@ -51,11 +51,11 @@ async def gather(
     # Create a queue for the processor
     response_queue = asyncio.Queue()
 
-    # Create an event to pause the crawler
-    pause_crawling = asyncio.Event()
+    # Event to pause crawler and processor
+    pause = asyncio.Event()
 
-    # Create an event to end the crawler
-    stop_crawling = asyncio.Event()
+    # Event to end crawler and processor
+    end = asyncio.Event()
 
     # Create a list to store seen urls
     seen_urls = AsyncList()
@@ -91,8 +91,8 @@ async def gather(
         },
         client=client,
         response_queue=response_queue,
-        pause=pause_crawling,
-        end=stop_crawling,
+        pause=pause,
+        end=end,
         seen_urls=seen_urls,
         max_iter=1,
     )
