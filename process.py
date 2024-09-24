@@ -23,6 +23,7 @@ class Response:
     type: str
     soup: BeautifulSoup
     url: str
+    url_id: int = -1
 
 
 async def process(
