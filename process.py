@@ -38,10 +38,16 @@ async def process(
     Processes responses collected by the crawler, turning them into
     embeddings, and other metadata used for searching.
     """
+    num_iter = 0
     while not pause.is_set():
         # Crawler ended?
         if end.is_set():
             break
+
+        if max_iter != -1 and num_iter >= max_iter:
+            break
+        else:
+            num_iter += 1
         
         # Get response from queue
         response: Response = await response_queue.get()
@@ -51,6 +57,7 @@ async def process(
             # Process webpage
             soup = response.soup
             vector, metadata = await process_html_to_vectors(soup, model, vector_client)
+            await store_embedding(vector, metadata, vector_client)
 
 
 async def process_html_to_vectors(
