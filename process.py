@@ -15,7 +15,10 @@ from qdrant_client.models import VectorParams, Distance, PointStruct
 import sentence_transformers
 from dataclasses import dataclass
 from typing import Optional
-from storage import store_embedding
+from storage import store_embedding, Resource, log_resource
+import asyncio
+from psycopg2.extensions import connection
+from datetime import datetime
 
 
 @dataclass
@@ -49,16 +52,54 @@ async def process(
             break
         else:
             num_iter += 1
-        
+
         # Get response from queue
         response: Response = await response_queue.get()
         response_queue.task_done()
-        
+
         if response.type == "webpage":
-            # Process webpage
             soup = response.soup
-            vector, metadata = await process_html_to_vectors(soup, model, vector_client)
-            await store_embedding(vector, metadata, vector_client)
+
+            # Process webpage
+            vectors, metadata = await process_html_to_vectors(
+                soup, model, vector_client
+            )
+
+            # Store the vectors and metadata
+            vectors = vectors.tolist()
+            metadata = [metadata] * len(vectors)
+
+            await store_embedding(vectors, metadata, vector_client)
+
+            # Get the base site
+            base_site = get_base_site(response.url)
+
+            # Get all the external links
+            links = soup.find_all("a")
+            drop_strings = [""]
+            first_letter_drops = ["#", "/"]
+            links = [
+                link["href"]
+                for link in links
+                if base_site not in link["href"]
+                and link["href"] not in drop_strings
+                and link["href"][0] not in first_letter_drops
+            ]
+
+            # TODO: Setup a swtich statement or function for this that checks if the
+            # resource is already present in the database before adding it.
+            # Log a new resource
+            if response.url_id == -1:
+                # Create a new resource
+                resource = Resource(
+                    url=response.url,
+                    firstVisited=datetime.now(),
+                    lastVisited=datetime.now(),
+                    allVisits=1,
+                    externalLinks=links,
+                )
+
+                await log_resource(resource, db_client)
 
 
 async def process_html_to_vectors(
