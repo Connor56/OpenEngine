@@ -48,7 +48,7 @@ async def test_store_embedding():
 
 
 @pytest.mark.asyncio
-async def test_log_resource(postgres_client):
+async def test_log_resource(empty_postgres_client):
     """
     Checks that the log_resource function correctly logs information
     about a searched resource to the postgres database.
@@ -64,26 +64,21 @@ async def test_log_resource(postgres_client):
     )
 
     # Get the postgres client
-    db_client, stop, temp_dir = postgres_client
+    db_client = empty_postgres_client
 
-    try:
-        cursor = db_client.cursor()
+    cursor = db_client.cursor()
 
-        # Log the resource
-        await st.log_resource(resource, db_client)
+    # Log the resource
+    await st.log_resource(resource, db_client)
 
-        # Get the resource from the database
-        cursor.execute("SELECT * FROM resources")
-        
-        results = cursor.fetchall()
+    # Get the resource from the database
+    cursor.execute("SELECT * FROM resources")
+    
+    results = cursor.fetchall()
 
-        # Was it added correctly?
-        assert len(results) == 1
-        assert results[0][0] == 1
-        assert results[0][1] == "https://example.com"
-        assert results[0][4] == 1
-        assert results[0][5] == []
-
-    finally:
-        print("cleaning up")
-        stop(temp_dir)
+    # Was it added correctly?
+    assert len(results) == 1
+    assert results[0][0] == 1
+    assert results[0][1] == "https://example.com"
+    assert results[0][4] == 1
+    assert results[0][5] == []
