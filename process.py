@@ -113,8 +113,6 @@ async def process_html_to_vectors(
     Processes a BeautifulSoup object into a list of sentences and turns each of them
     into a vector using the sentence_transformers model. Puts the vectors into a Qdrant
     collection.
-
-    This is test code for now.
     """
     # Extract visible text from the soup
     visible_text = extract_visible_text(soup)
