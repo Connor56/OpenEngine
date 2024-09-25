@@ -55,7 +55,7 @@ async def test_crawler_link_filter(mocker):
     # Check response queue outputs
     assert not response_queue.empty()
     assert response_queue.qsize() == 1
-    response_text = str(list(response_queue._queue)[0])
+    response_text = str(list(response_queue._queue)[0].soup)
     assert response_text == mock_response.text
 
 
