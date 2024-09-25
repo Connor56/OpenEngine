@@ -30,7 +30,7 @@ async def test_store_embedding():
     stored = await st.store_embedding(
         vector=vector,
         metadata=metadata,
-        db_client=client,
+        vector_client=client,
     )
     assert stored is True
 
