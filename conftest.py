@@ -1,5 +1,42 @@
 import pytest
 from datetime import datetime
+import http.server
+import socketserver
+import threading
+from pathlib import Path
+
+
+# Fixture to start and stop the local HTTP server
+@pytest.fixture(scope="session")
+def local_site():
+    # Define the directory where the HTML files are located
+    location = "test_data/simple_site"
+    site_directory = Path(__file__).parent / location  # Folder containing your HTML files
+
+    # Check if the directory exists
+    if not site_directory.exists():
+        raise RuntimeError(f"Directory {site_directory} does not exist")
+
+    # Define the handler to serve the directory
+    handler = http.server.SimpleHTTPRequestHandler
+    # handler.directory = str(site_directory)  # Set the directory to serve files from
+
+    # Define the server (localhost with a random available port)
+    with socketserver.TCPServer(("", 0), handler) as httpd:
+        port = httpd.server_address[1]  # Get the port number
+        server_url = f"http://localhost:{port}/{location}"
+
+        # Start the server in a new thread
+        server_thread = threading.Thread(target=httpd.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
+
+        # Yield the URL to be used in tests
+        yield server_url
+
+        # Shut down the server after the test
+        httpd.shutdown()
+        server_thread.join()
 
 
 @pytest.fixture(scope="function")
