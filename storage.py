@@ -13,6 +13,7 @@ import numpy as np
 from dataclasses import dataclass
 from datetime import datetime
 import psycopg2
+from uuid import uuid4
 
 
 @dataclass
@@ -72,7 +73,7 @@ async def store_embedding(
         # Create a qdrant point struct
         points.append(
             PointStruct(
-                id=idx,
+                id=uuid4().hex,
                 vector=vector.tolist() if isinstance(vector, np.ndarray) else vector,
                 payload={"text": metadata[idx]},
             )
@@ -82,7 +83,8 @@ async def store_embedding(
     try:
         vector_client.upsert(
             collection_name="embeddings",
-            points=points
+            points=points,
+            wait=True,
         )
 
     except Exception as e:
