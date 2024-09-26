@@ -65,6 +65,8 @@ async def process(
                 soup, model, vector_client
             )
 
+            metadata["url"] = response.url
+
             # Store the vectors and metadata
             vectors = vectors.tolist()
             metadata = [metadata] * len(vectors)
