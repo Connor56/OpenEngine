@@ -34,7 +34,7 @@ async def test_process(embedding_model, soup, vector_client, empty_postgres_clie
     assert len(all_entries[0]) == 4
 
     # Check vector metadata is correct
-    assert all_entries[0][0].payload == {"text": {}}
+    assert all_entries[0][0].payload == {"text": {"url": "https://caseyhandmer.wordpress.com/"}}
 
     # Check the postgres client has a record
     cursor = empty_postgres_client.cursor()
@@ -45,4 +45,5 @@ async def test_process(embedding_model, soup, vector_client, empty_postgres_clie
     assert results[0][0] == 1
     assert results[0][1] == "https://caseyhandmer.wordpress.com/"
     assert results[0][4] == 1
+    assert len(results[0][5]) == 5
 
