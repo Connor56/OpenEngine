@@ -88,6 +88,9 @@ async def process(
                 and link["href"][0] not in first_letter_drops
             ]
 
+            links = clean_urls(links)
+            links = handle_relative_url(links, response.url, base_site)
+
             # TODO: Setup a swtich statement or function for this that checks if the
             # resource is already present in the database before adding it.
             # Log a new resource
