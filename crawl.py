@@ -133,7 +133,10 @@ async def crawler(
             html = response.text
             soup = BeautifulSoup(html, "lxml")
 
-            response_queue.put_nowait(soup)
+            # Create a response
+            response = Response(type="webpage", soup=soup, url=url)
+
+            response_queue.put_nowait(response)
 
         # Get all links from the soup
         if soup is not None:
