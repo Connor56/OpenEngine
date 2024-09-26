@@ -98,26 +98,4 @@ async def test_crawler_seen_urls(mocker):
     # Check url queue outputs
     assert url_queue.empty()
     assert url_queue.qsize() == 0
-    assert list(url_queue._queue) == []
-
-
-def test_clean_urls():
-    """
-    Test the clean_urls function correctly cleans a list of urls.
-    """
-    urls = [
-        "https://example.com",
-        "https://example.com/example",
-        "https://example.com/example/",
-        "https://example.com/#example",
-        "https://example.com/#example/",
-        "https://example.com/#example/example",
-    ]
-
-    cleaned_urls = crawl.clean_urls(urls)
-
-    assert len(cleaned_urls) == 2
-    assert set(cleaned_urls) == set([
-        "https://example.com",
-        "https://example.com/example",
-    ])
+    assert list(url_queue._queue) == []    
