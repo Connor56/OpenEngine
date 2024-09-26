@@ -172,6 +172,7 @@ async def crawler(
 
         # Filter the links
         addable_urls = filter_func(all_links, **filter_kwargs)
+        addable_urls.sort()
 
         # Retrieve seen urls
         if isinstance(seen_urls, AsyncList):
