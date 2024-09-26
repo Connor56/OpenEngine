@@ -12,7 +12,7 @@ import sentence_transformers
 import psycopg2
 import asyncio
 from crawl import AsyncList, pattern_filter, crawler
-from process import process_html_to_vectors, process
+from process import process
 import datetime
 import httpx
 
