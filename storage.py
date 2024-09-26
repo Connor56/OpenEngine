@@ -136,6 +136,6 @@ async def log_resource(
 
         return True
     except Exception as e:
-        print(e)
+        print("Failed to load resource with error:",e)
 
         return False
