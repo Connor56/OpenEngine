@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from typing import List
 import re
 from urllib.parse import urlparse, urlunparse
+from process import Response
 from utility import get_base_site, clean_urls, handle_relative_url
 
 
@@ -130,6 +131,8 @@ async def crawler(
 
         # Get soup object on success
         if response.status_code == 200:
+
+            # Turn html into a response text
             html = response.text
             soup = BeautifulSoup(html, "lxml")
 
@@ -159,9 +162,11 @@ async def crawler(
 
         print("all_links:", all_links)
 
+        # Set up the filter function
         filter_func = url_filter["filter_func"]
         filter_kwargs = url_filter["kwargs"]
 
+        # Filter the links
         addable_urls = filter_func(all_links, **filter_kwargs)
 
         # Retrieve seen urls
@@ -171,10 +176,9 @@ async def crawler(
             all_urls = seen_urls[:]
 
         # Add unseen urls to crawl queue
-        for url in addable_urls:
+        for addable_url in addable_urls:
+
             # Check it hasn't already been seen
-            if url not in all_urls:
-                await url_queue.put(url)
-                seen_urls.append(url)
-
-
+            if addable_url not in all_urls:
+                await url_queue.put(addable_url)
+                seen_urls.append(addable_url)
