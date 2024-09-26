@@ -112,6 +112,7 @@ async def crawler(
         The maximum number of iterations to run the crawler for.
     """
     num_iter = 0
+    print("max_iter:", max_iter)
     while not pause.is_set():
         # Crawler ended?
         if end.is_set():
@@ -123,8 +124,11 @@ async def crawler(
         else:
             num_iter += 1
 
+        # Get next url
         url = await url_queue.get()
         url_queue.task_done()
+
+        print("url:", url)
 
         soup = None
         response = await client.get(url, timeout=7)
