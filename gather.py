@@ -78,14 +78,20 @@ async def gather(
     current_time = datetime.datetime.now()
     retry_urls = [url[0] for url in all_urls if current_time - url[1] > revisit_delta]
 
+    print("retry urls:", retry_urls)
+
     # Add the retry urls to the url queue
     for url in retry_urls:
         await url_queue.put(url)
+
+    print("url queue:", url_queue.qsize())
 
     # Add the remaining seen urls to the seen urls list
     remaining_urls = [url[0] for url in all_urls if url not in retry_urls]
     for url in remaining_urls:
         await seen_urls.append(url)
+
+    print("seen urls:", seen_urls)
 
     # Create a process coroutine
     task = asyncio.create_task(
@@ -99,6 +105,8 @@ async def gather(
             max_iter=max_iter,
         )
     )
+
+    print("task:", task)
 
     # Filter patterns for urls
     url_filter = {
