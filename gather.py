@@ -100,13 +100,23 @@ async def gather(
         )
     )
 
+    # Filter patterns for urls
+    url_filter = {
+        "filter_func": pattern_filter,
+        "kwargs": {
+            "regex_patterns": [
+                "https://", # Any https link
+                "http://", # Any http link
+                # TODO: Make this internal link pattern into something contained in the crawler
+                # "(/[^ ]*|(\.\./)*[^/ ]+\.html|[^/ ]+\.html|[^/ ]+/[^ ]*)", # Any internal link
+            ]
+        },
+    }
+
     # Create a crawler coroutine
     await crawler(
         url_queue,
-        url_filter={
-            "filter_func": pattern_filter,
-            "kwargs": {"regex_patterns": ["https://"]},
-        },
+        url_filter=url_filter,
         client=client,
         response_queue=response_queue,
         pause=pause,
