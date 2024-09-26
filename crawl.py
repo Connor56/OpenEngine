@@ -138,6 +138,11 @@ async def crawler(
 
             response_queue.put_nowait(response)
 
+        else:
+            print("failed to get response for url:", url)
+            print("skipping...")
+            continue
+
         # Get all links from the soup
         if soup is not None:
             all_links = soup.find_all("a")
