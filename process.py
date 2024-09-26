@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 import re
 import numpy as np
 from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
 import sentence_transformers
 from dataclasses import dataclass
 from typing import Optional
