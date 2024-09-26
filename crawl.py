@@ -126,7 +126,7 @@ async def crawler(
         url_queue.task_done()
 
         soup = None
-        response = await client.get(url)
+        response = await client.get(url, timeout=7)
 
         # Get soup object on success
         if response.status_code == 200:
