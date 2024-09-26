@@ -146,9 +146,19 @@ async def crawler(
         # Get all links from the soup
         if soup is not None:
             all_links = soup.find_all("a")
-            all_links = [link.get("href") for link in all_links]
 
-        # Filter the links
+        # Base domain of current url
+        base_site = get_base_site(url)
+
+        # Clean up the links
+        all_links = [link.get("href") for link in all_links]
+        all_links = clean_urls(all_links)
+
+        # Make all links absolute
+        all_links = handle_relative_url(all_links, url, base_site)
+
+        print("all_links:", all_links)
+
         filter_func = url_filter["filter_func"]
         filter_kwargs = url_filter["kwargs"]
 
