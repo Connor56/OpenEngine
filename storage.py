@@ -129,7 +129,7 @@ async def log_resource(
     try:
         cursor = db_client.cursor()
 
-        await cursor.execute(
+        cursor.execute(
             "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
             attributes,
         )
