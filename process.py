@@ -90,6 +90,7 @@ async def process(
 
             links = clean_urls(links)
             links = handle_relative_url(links, response.url, base_site)
+            links.sort()
 
             # TODO: Setup a swtich statement or function for this that checks if the
             # resource is already present in the database before adding it.
