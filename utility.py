@@ -9,6 +9,7 @@ Created:
 from urllib.parse import urlparse, urlunparse
 from typing import List
 
+
 def clean_urls(
     urls,
 ):
@@ -42,10 +43,14 @@ def handle_relative_url(
     """
     if not isinstance(urls, list):
         urls = [urls]
-    
+
     for idx, url in enumerate(urls):
         # Get the parsed url
         parsed_url = urlparse(url)
+
+        # Skip empty urls
+        if url == "":
+            continue
 
         # Add the base site to internal links
         if url[0] == "/":
