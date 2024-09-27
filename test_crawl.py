@@ -4,14 +4,6 @@ import httpx
 import crawl
 
 
-def test_crawler():
-    """
-    Test the crawler function correctly crawls a website and returns
-    links on the page.
-    """
-    pass
-
-
 @pytest.mark.asyncio
 async def test_crawler_link_filter(mocker):
     """
@@ -98,7 +90,7 @@ async def test_crawler_seen_urls(mocker):
     # Check url queue outputs
     assert url_queue.empty()
     assert url_queue.qsize() == 0
-    assert list(url_queue._queue) == []    
+    assert list(url_queue._queue) == []
 
 
 @pytest.mark.asyncio
