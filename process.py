@@ -61,9 +61,7 @@ async def process(
             soup = response.soup
 
             # Process webpage
-            vectors, metadata = await process_html_to_vectors(
-                soup, model, vector_client
-            )
+            vectors, metadata = await process_html_to_vectors(soup, model)
 
             metadata["url"] = response.url
 
