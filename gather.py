@@ -76,7 +76,9 @@ async def gather(
 
     # Filter out the urls to be revisited
     current_time = datetime.datetime.now()
-    retry_urls = [url[0] for url in all_urls if current_time - url[1] > revisit_delta]
+    retry_urls = [
+        url[0] for url in all_urls if current_time - url[1] > revisit_delta
+    ]
 
     print("retry urls:", retry_urls)
 
@@ -113,8 +115,8 @@ async def gather(
         "filter_func": pattern_filter,
         "kwargs": {
             "regex_patterns": [
-                "https://", # Any https link
-                "http://", # Any http link
+                "https://",  # Any https link
+                "http://",  # Any http link
                 # TODO: Make this internal link pattern into something contained in the crawler
                 # "(/[^ ]*|(\.\./)*[^/ ]+\.html|[^/ ]+\.html|[^/ ]+/[^ ]*)", # Any internal link
             ]
