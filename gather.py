@@ -67,7 +67,7 @@ async def gather(
     seen_urls = AsyncList()
 
     # Create an httpx client
-    client = httpx.AsyncClient()
+    client = httpx.AsyncClient(follow_redirects=True)
 
     # Get all the urls from the postgres database
     cursor = db_client.cursor()
