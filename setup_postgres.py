@@ -1,9 +1,20 @@
 import tempfile
 import subprocess
 import os
+from typing import Tuple
 
 
-def start_ephemeral_postgres():
+def start_ephemeral_postgres() -> Tuple[tempfile.TemporaryDirectory, str]:
+    """
+    Creates a temporary directory for a postgres database and starts
+    the postgres server.
+
+    Returns
+    -------
+    Tuple[tempfile.TemporaryDirectory, str]
+        A tuple containing the temporary directory and the port the
+        postgres server is running on.
+    """
     # Create a temporary directory for the data
     temp_dir = tempfile.TemporaryDirectory()
     data_dir = os.path.join(temp_dir.name, "data")
@@ -29,6 +40,15 @@ def start_ephemeral_postgres():
 
 
 def stop_ephemeral_postgres(temp_dir):
+    """
+    Uses the temporary directory and port from
+    start_ephemeral_postgres to stop the postgres server.
+
+    Parameters
+    ----------
+    temp_dir : tempfile.TemporaryDirectory
+        The temporary directory created by start_ephemeral_postgres.
+    """
     # Stop the PostgreSQL server
     subprocess.run(
         [
