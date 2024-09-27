@@ -147,6 +147,7 @@ async def crawler(
 
         else:
             print("failed to get response for url:", url)
+            print(response)
             print("skipping...")
             continue
 
@@ -175,6 +176,7 @@ async def crawler(
         addable_urls.sort()
 
         # Retrieve seen urls
+        print(type(seen_urls), isinstance(seen_urls, AsyncList))
         if isinstance(seen_urls, AsyncList):
             all_urls = await seen_urls.get_all()
         else:
