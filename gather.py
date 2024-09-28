@@ -11,7 +11,8 @@ from qdrant_client import QdrantClient
 import sentence_transformers
 import psycopg2
 import asyncio
-from crawl import AsyncList, pattern_filter, crawler
+from crawl import pattern_filter, crawler
+from app_types import AsyncList
 from process import process
 import datetime
 import httpx
