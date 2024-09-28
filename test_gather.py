@@ -44,9 +44,11 @@ async def test_gather(
     )
 
     # Check the vectors and metadata were stored correctly
-    points = vector_client.scroll(
+    points = await vector_client.scroll(
         collection_name="embeddings", with_payload=True, with_vectors=True
-    )[0]
+    )
+
+    points = points[0]
 
     assert len(points) == 4
 

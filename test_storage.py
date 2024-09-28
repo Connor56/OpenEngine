@@ -20,8 +20,8 @@ async def test_store_embedding():
     metadata = {"test": "example meta"}
 
     # Create a Qdrant client
-    client = qdrant_client.QdrantClient(":memory:")
-    client.create_collection(
+    client = qdrant_client.AsyncQdrantClient(":memory:")
+    await client.create_collection(
         collection_name="embeddings",
         vectors_config=VectorParams(size=5, distance=Distance.COSINE),
     )
@@ -35,14 +35,16 @@ async def test_store_embedding():
     assert stored is True
 
     # Check the vector and metadata were stored correctly
-    points = client.scroll(
-        collection_name="embeddings",
-        with_payload=True,
-        with_vectors=True
-    )[0]
+    points = await client.scroll(
+        collection_name="embeddings", with_payload=True, with_vectors=True
+    )
+    points = points[0]
 
     assert len(points) == 1
-    assert points[0].vector == (vector/np.linalg.norm(vector)).astype(np.float32).tolist()
+    assert (
+        points[0].vector
+        == (vector / np.linalg.norm(vector)).astype(np.float32).tolist()
+    )
     assert points[0].payload["text"] == metadata
 
 
@@ -52,6 +54,7 @@ async def test_store_two_embedding(vector_client):
     Test the store_embedding function correctly stores two vectors and
     metadata via two separate function calls.
     """
+
     # Create a vector and metadata
     generator = np.random.default_rng(seed=0)
     vector1 = generator.random(384)
@@ -79,24 +82,31 @@ async def test_store_two_embedding(vector_client):
     assert stored is True
 
     # Check the vector and metadata were stored correctly
-    points = vector_client.scroll(
-        collection_name="embeddings",
-        with_payload=True,
-        with_vectors=True
-    )[0]
+    points = await vector_client.scroll(
+        collection_name="embeddings", with_payload=True, with_vectors=True
+    )
+    points = points[0]
 
     assert len(points) == 2
 
     # Get the indexes of the vectors 1 and 2
     # This must be done because order is based on randomly assigned uuids and thus is
     # not guaranteed
-    idx1 = [idx for idx, point in enumerate(points) if point.payload == {"text": metadata1}][0]
+    idx1 = [
+        idx for idx, point in enumerate(points) if point.payload == {"text": metadata1}
+    ][0]
     idx2 = 0 if idx1 == 1 else 1
 
     # Check the vectors and payload are as expected
-    assert points[idx1].vector == (vector1/np.linalg.norm(vector1)).astype(np.float32).tolist()
+    assert (
+        points[idx1].vector
+        == (vector1 / np.linalg.norm(vector1)).astype(np.float32).tolist()
+    )
     assert points[idx1].payload["text"] == metadata1
-    assert points[idx2].vector == (vector2/np.linalg.norm(vector2)).astype(np.float32).tolist()
+    assert (
+        points[idx2].vector
+        == (vector2 / np.linalg.norm(vector2)).astype(np.float32).tolist()
+    )
     assert points[idx2].payload["text"] == metadata2
 
 
@@ -126,7 +136,7 @@ async def test_log_resource(empty_postgres_client):
 
     # Get the resource from the database
     cursor.execute("SELECT * FROM resources")
-    
+
     results = cursor.fetchall()
 
     # Was it added correctly?

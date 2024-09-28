@@ -46,7 +46,7 @@ async def test_process(
     # Check the queue is empty
     assert response_queue.empty()
 
-    all_entries = vector_client.scroll(
+    all_entries = await vector_client.scroll(
         collection_name="embeddings", with_vectors=True
     )
 
@@ -118,8 +118,9 @@ async def test_process_with_empty_links(
     # Check the queue is empty
     assert response_queue.empty()
 
-    all_entries = vector_client.scroll(
-        collection_name="embeddings", with_vectors=True
+    all_entries = await vector_client.scroll(
+        collection_name="embeddings",
+        with_vectors=True,
     )
 
     # Check 1 vector was added
