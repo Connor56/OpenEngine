@@ -161,13 +161,30 @@ def vector_client(base_vector_client):
     from qdrant_client.models import VectorParams, Distance
 
     base_vector_client.create_collection(
+@pytest_asyncio.fixture(scope="function")
+async def search_vector_client(base_vector_client):
+    """
+    A fixture that provides a Qdrant client with the embeddings collection
+    populated with test data crawled from CJ Handmer's blog.
+    """
+    from qdrant_client.models import VectorParams, Distance
+    from joblib import load
+
+    await base_vector_client.create_collection(
         collection_name="embeddings",
         vectors_config=VectorParams(size=384, distance=Distance.COSINE),
     )
 
+    vectors = load("test_data/search_data/qdrant_vectors.joblib")
+    await base_vector_client.upsert(
+        collection_name="embeddings",
+        points=vectors,
+        wait=True,
+    )
+
     yield base_vector_client
 
-    base_vector_client.delete_collection("embeddings")
+    await base_vector_client.delete_collection("embeddings")
 
 
 @pytest.fixture(scope="session")
