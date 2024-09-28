@@ -83,9 +83,7 @@ async def gather(
 
     # Filter out the urls to be revisited
     current_time = datetime.datetime.now()
-    retry_urls = [
-        url[0] for url in all_urls if current_time - url[1] > revisit_delta
-    ]
+    retry_urls = [url[0] for url in all_urls if current_time - url[1] > revisit_delta]
 
     print("retry urls:", retry_urls)
 
