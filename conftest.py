@@ -177,9 +177,7 @@ def embedding_model():
     """
     import sentence_transformers
 
-    return sentence_transformers.SentenceTransformer(
-        "multi-qa-MiniLM-L6-cos-v1"
-    )
+    return sentence_transformers.SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
 
 
 @pytest.fixture(scope="function")
