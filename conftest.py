@@ -11,7 +11,9 @@ from pathlib import Path
 def local_site():
     # Define the directory where the HTML files are located
     location = "test_data/simple_site"
-    site_directory = Path(__file__).parent / location  # Folder containing your HTML files
+    site_directory = (
+        Path(__file__).parent / location
+    )  # Folder containing your HTML files
 
     # Check if the directory exists
     if not site_directory.exists():
@@ -39,11 +41,11 @@ def local_site():
         server_thread.join()
 
 
-@pytest.fixture(scope="function")
-def empty_postgres_client():
+@pytest.fixture(scope="session")
+def base_postgres_client():
     """
-    A fixture that provides a psycopg2 client for testing and a the function for killing
-    the server once the user is complete.
+    A fixture that provides a session created postgres client for
+    testing, that can be re-used and speed up testing time.
     """
     import psycopg2
     from setup_postgres import start_ephemeral_postgres, stop_ephemeral_postgres
@@ -55,26 +57,10 @@ def empty_postgres_client():
 
         # Connect to the temporary PostgreSQL server
         client = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            host="localhost",
-            port=port
+            dbname="postgres", user="postgres", host="localhost", port=port
         )
+
         print("connected to postgres")
-
-        cursor = client.cursor()
-
-        # Create the table
-        table_sql = """CREATE TABLE resources ( 
-            id SERIAL PRIMARY KEY,
-            url VARCHAR(2048) NOT NULL,
-            firstVisited TIMESTAMP NOT NULL,
-            lastVisited TIMESTAMP NOT NULL,
-            allVisits INT DEFAULT 1,
-            externalLinks TEXT[]
-        );"""
-
-        cursor.execute(table_sql)
 
         yield client
 
@@ -91,60 +77,67 @@ def empty_postgres_client():
 
 
 @pytest.fixture(scope="function")
-def populated_postgres_client():
+def empty_postgres_client(base_postgres_client):
+    """
+    A fixture that puts an empty resources table into the postgres
+    client and provides it for testing. Then drops the table once
+    the function is complete.
+    """
+
+    cursor = base_postgres_client.cursor()
+
+    # Create the table
+    table_sql = """CREATE TABLE resources ( 
+        id SERIAL PRIMARY KEY,
+        url VARCHAR(2048) NOT NULL,
+        firstVisited TIMESTAMP NOT NULL,
+        lastVisited TIMESTAMP NOT NULL,
+        allVisits INT DEFAULT 1,
+        externalLinks TEXT[]
+    );"""
+
+    cursor.execute(table_sql)
+
+    yield base_postgres_client
+
+    cursor.execute("DROP TABLE resources")
+
+
+@pytest.fixture(scope="function")
+def populated_postgres_client(base_postgres_client):
     """
     A fixture that provides a psycopg2 client for testing and a the function for killing
     the server once the user is complete.
     """
-    import psycopg2
-    from setup_postgres import start_ephemeral_postgres, stop_ephemeral_postgres
+    cursor = base_postgres_client.cursor()
 
-    try:
-        # Start a temporary PostgreSQL server
-        print("starting postgres")
-        temp_dir, port = start_ephemeral_postgres()
+    # Create the table
+    table_sql = """CREATE TABLE resources ( 
+        id SERIAL PRIMARY KEY,
+        url VARCHAR(2048) NOT NULL,
+        firstVisited TIMESTAMP NOT NULL,
+        lastVisited TIMESTAMP NOT NULL,
+        allVisits INT DEFAULT 1,
+        externalLinks TEXT[]
+    );"""
 
-        # Connect to the temporary PostgreSQL server
-        client = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            host="localhost",
-            port=port
-        )
-        print("connected to postgres")
+    cursor.execute(table_sql)
 
-        cursor = client.cursor()
+    # Insert a resource
+    cursor.execute(
+        "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
+        (
+            "https://caseyhandmer.wordpress.com/",
+            datetime.now(),
+            datetime.now(),
+            1,
+            [],
+        ),
+    )
 
-        # Create the table
-        table_sql = """CREATE TABLE resources ( 
-            id SERIAL PRIMARY KEY,
-            url VARCHAR(2048) NOT NULL,
-            firstVisited TIMESTAMP NOT NULL,
-            lastVisited TIMESTAMP NOT NULL,
-            allVisits INT DEFAULT 1,
-            externalLinks TEXT[]
-        );"""
+    yield base_postgres_client
 
-        cursor.execute(table_sql)
-
-        # Insert a resource
-        cursor.execute(
-            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
-            ("https://caseyhandmer.wordpress.com/", datetime.now(), datetime.now(), 1, [])
-        )
-
-        yield client
-
-        client.close()
-
-    except Exception as e:
-        print(e)
-        stop_ephemeral_postgres(temp_dir)
-
-    finally:
-        print("cleaning up")
-
-        stop_ephemeral_postgres(temp_dir)
+    cursor.execute("DROP TABLE resources")
 
 
 @pytest.fixture(scope="function")
@@ -171,7 +164,9 @@ def embedding_model():
     """
     import sentence_transformers
 
-    return sentence_transformers.SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
+    return sentence_transformers.SentenceTransformer(
+        "multi-qa-MiniLM-L6-cos-v1"
+    )
 
 
 @pytest.fixture(scope="function")
