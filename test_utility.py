@@ -26,6 +26,16 @@ def test_clean_urls():
     )
 
 
+def test_clean_urls_removes_none():
+    """
+    None's can appear in the urls list, so need to make sure they are
+    removed.
+    """
+    urls = [None]
+    cleaned_urls = utility.clean_urls(urls)
+    assert cleaned_urls == []
+
+
 def test_handle_relative_url():
     """
     Test the handle_relative_url function correctly handles relative
