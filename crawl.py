@@ -104,7 +104,7 @@ async def crawler(
         url = await url_queue.get()
         url_queue.task_done()
 
-        print("url:", url)
+        print("\n\nurl:", url)
 
         soup = None
         response = await client.get(url, timeout=7)
@@ -140,8 +140,6 @@ async def crawler(
 
         # Make all links absolute
         all_links = handle_relative_url(all_links, url, base_site)
-
-        print("all_links:", all_links)
 
         # Set up the filter function
         filter_func = url_filter["filter_func"]
