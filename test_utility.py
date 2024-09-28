@@ -4,7 +4,8 @@ import utility
 
 def test_clean_urls():
     """
-    Test the clean_urls function correctly cleans a list of urls.
+    Test the clean_urls function correctly cleans a list of urls. Of
+    meaningless url endings.
     """
     urls = [
         "https://example.com",
@@ -13,6 +14,7 @@ def test_clean_urls():
         "https://example.com/#example",
         "https://example.com/#example/",
         "https://example.com/#example/example",
+        "https://example.com/example?query=1",
     ]
 
     cleaned_urls = utility.clean_urls(urls)

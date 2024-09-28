@@ -29,7 +29,7 @@ def clean_urls(
 
         parsed_url = urlparse(url)
 
-        cleaned_url = parsed_url._replace(fragment="")
+        cleaned_url = parsed_url._replace(fragment="", query="", params="")
 
         final_url = urlunparse(cleaned_url).rstrip("/")
 
