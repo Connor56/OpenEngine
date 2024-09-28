@@ -81,7 +81,8 @@ async def process(
             links = [
                 link["href"]
                 for link in links
-                if base_site not in link["href"]
+                if link.has_attr("href")
+                and base_site not in link["href"]
                 and link["href"] not in drop_strings
                 and link["href"][0] not in first_letter_drops
             ]
