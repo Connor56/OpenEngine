@@ -11,17 +11,22 @@ from typing import List
 
 
 def clean_urls(
-    urls,
+    urls: List[str],
 ):
     """
     Cleans a list of urls by removing fragments and trailing slashes,
     and adds them to a set to ensure no duplicates. Returns these
     urls.
     """
+
+    # Filter urls that are None
+    urls = [url for url in urls if url is not None]
+
     cleaned_urls = set()
 
     # Remove fragments and trailing slashes
     for url in urls:
+
         parsed_url = urlparse(url)
 
         cleaned_url = parsed_url._replace(fragment="")
