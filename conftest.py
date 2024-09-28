@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 from datetime import datetime
 import http.server
 import socketserver
@@ -146,21 +147,34 @@ def base_vector_client():
     A fixture that provides a base qdrant client in memory that's used
     throughout the tests.
     """
-    from qdrant_client import QdrantClient
+    from qdrant_client import AsyncQdrantClient
 
-    client = QdrantClient(":memory:")
-    return client
+    client = AsyncQdrantClient(":memory:")
+
+    yield client
+
+    client.close()
+    del client
 
 
-@pytest.fixture(scope="function")
-def vector_client(base_vector_client):
+@pytest_asyncio.fixture(scope="function")
+async def vector_client(base_vector_client):
     """
     A fixture that provides a Qdrant client with the embeddings collection
     for testing. That is cleaned once the function is complete.
     """
     from qdrant_client.models import VectorParams, Distance
 
-    base_vector_client.create_collection(
+    await base_vector_client.create_collection(
+        collection_name="embeddings",
+        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+    )
+
+    yield base_vector_client
+
+    await base_vector_client.delete_collection("embeddings")
+
+
 @pytest_asyncio.fixture(scope="function")
 async def search_vector_client(base_vector_client):
     """
