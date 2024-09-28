@@ -7,7 +7,7 @@ Created:
 """
 
 from typing import List, Dict, Any
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 import numpy as np
 from dataclasses import dataclass
@@ -28,7 +28,7 @@ class Resource:
 async def store_embedding(
     vector: np.ndarray | List[np.ndarray] | List[float] | List[List[float]],
     metadata: Dict[str, Any] | List[Dict[str, Any]],
-    vector_client: QdrantClient,
+    vector_client: AsyncQdrantClient,
 ) -> bool:
     """
     Stores data in the qdrant database.
@@ -78,10 +78,10 @@ async def store_embedding(
                 payload={"text": metadata[idx]},
             )
         )
-    
+
     # Store points in qdrant
     try:
-        vector_client.upsert(
+        await vector_client.upsert(
             collection_name="embeddings",
             points=points,
             wait=True,

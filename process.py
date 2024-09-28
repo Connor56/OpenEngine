@@ -10,7 +10,7 @@ Created:
 from bs4 import BeautifulSoup
 import re
 import numpy as np
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient
 import sentence_transformers
 from dataclasses import dataclass
 from typing import Optional
@@ -32,7 +32,7 @@ class Response:
 async def process(
     response_queue: asyncio.Queue,
     model: sentence_transformers.SentenceTransformer,
-    vector_client: QdrantClient,
+    vector_client: AsyncQdrantClient,
     db_client: connection,
     pause: asyncio.Event,
     end: asyncio.Event,

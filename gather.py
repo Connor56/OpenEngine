@@ -7,7 +7,7 @@ Created:
     2024-09-19
 """
 
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient
 import sentence_transformers
 import psycopg2
 import asyncio
@@ -21,7 +21,7 @@ from typing import List
 
 
 async def gather(
-    vector_client: QdrantClient,
+    vector_client: AsyncQdrantClient,
     db_client: psycopg2.extensions.connection,
     model: sentence_transformers.SentenceTransformer,
     revisit_delta: datetime.timedelta = datetime.timedelta(days=1),
