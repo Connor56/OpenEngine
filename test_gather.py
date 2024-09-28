@@ -6,7 +6,9 @@ import storage as st
 
 
 @pytest.mark.asyncio
-async def test_gather(empty_postgres_client, vector_client, embedding_model, local_site):
+async def test_gather(
+    empty_postgres_client, vector_client, embedding_model, local_site
+):
     """
     Test the gather function correctly crawls a website and returns
     links on the page.
@@ -38,13 +40,12 @@ async def test_gather(empty_postgres_client, vector_client, embedding_model, loc
         embedding_model,
         revisit_delta=datetime.timedelta(microseconds=0),
         max_iter=4,
+        regex_patterns=["https://", "http://"],
     )
 
     # Check the vectors and metadata were stored correctly
     points = vector_client.scroll(
-        collection_name="embeddings",
-        with_payload=True,
-        with_vectors=True
+        collection_name="embeddings", with_payload=True, with_vectors=True
     )[0]
 
     assert len(points) == 4

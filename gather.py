@@ -16,6 +16,8 @@ from app_types import AsyncList
 from process import process
 import datetime
 import httpx
+from urllib.parse import urlparse
+from typing import List
 
 
 async def gather(
@@ -24,6 +26,7 @@ async def gather(
     model: sentence_transformers.SentenceTransformer,
     revisit_delta: datetime.timedelta = datetime.timedelta(days=1),
     max_iter: int = -1,
+    regex_patterns: List[str] | None = None,
 ):
     """
     Sets up the queues for the crawler and processor and starts the
@@ -50,6 +53,9 @@ async def gather(
         The maximum number of iterations to run the crawler and
         processor for. Defaults to -1, which means run indefinitely.
         This is for testing purposes.
+
+    regex_patterns : List[str] | None, optional
+        A list of regex patterns to filter urls by.
     """
 
     # Create a queue for the crawler
@@ -115,12 +121,9 @@ async def gather(
     url_filter = {
         "filter_func": pattern_filter,
         "kwargs": {
-            "regex_patterns": [
-                "https://",  # Any https link
-                "http://",  # Any http link
-                # TODO: Make this internal link pattern into something contained in the crawler
-                # "(/[^ ]*|(\.\./)*[^/ ]+\.html|[^/ ]+\.html|[^/ ]+/[^ ]*)", # Any internal link
-            ]
+            "regex_patterns": (
+                retry_urls if regex_patterns is None else regex_patterns
+            ),
         },
     }
 
