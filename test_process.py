@@ -5,7 +5,12 @@ from bs4 import BeautifulSoup
 
 
 @pytest.mark.asyncio
-async def test_process(embedding_model, soup, vector_client, empty_postgres_client):
+async def test_process(
+    embedding_model,
+    soup,
+    vector_client,
+    empty_postgres_client,
+):
     """
     Test the process function correctly crawls a website and returns
     links on the page.
@@ -21,21 +26,37 @@ async def test_process(embedding_model, soup, vector_client, empty_postgres_clie
     response_queue = asyncio.Queue()
 
     # Add a response to the queue
-    await response_queue.put(process.Response(type="webpage", soup=soup, url="https://caseyhandmer.wordpress.com/"))
+    await response_queue.put(
+        process.Response(
+            type="webpage", soup=soup, url="https://caseyhandmer.wordpress.com/"
+        )
+    )
 
     # Start the process
-    await process.process(response_queue, embedding_model, vector_client, empty_postgres_client, pause, end, max_iter=1)
+    await process.process(
+        response_queue,
+        embedding_model,
+        vector_client,
+        empty_postgres_client,
+        pause,
+        end,
+        max_iter=1,
+    )
 
     # Check the queue is empty
     assert response_queue.empty()
-    
-    all_entries = vector_client.scroll(collection_name="embeddings", with_vectors=True)
-    
+
+    all_entries = vector_client.scroll(
+        collection_name="embeddings", with_vectors=True
+    )
+
     # Check 4 vectors were added
     assert len(all_entries[0]) == 4
 
     # Check vector metadata is correct
-    assert all_entries[0][0].payload == {"text": {"url": "https://caseyhandmer.wordpress.com/"}}
+    assert all_entries[0][0].payload == {
+        "text": {"url": "https://caseyhandmer.wordpress.com/"}
+    }
 
     # Check the postgres client has a record
     cursor = empty_postgres_client.cursor()
