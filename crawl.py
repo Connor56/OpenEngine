@@ -16,31 +16,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 from process import Response
 from utility import get_base_site, clean_urls, handle_relative_url
-
-
-class AsyncList:
-    """
-    Simple asyncronous list class that allows for thread safe
-    appending and popping.
-    """
-
-    def __init__(self):
-        self._list = []
-        self._lock = asyncio.Lock()
-
-    async def append(self, item):
-        async with self._lock:
-            self._list.append(item)
-
-    async def get_all(self):
-        async with self._lock:
-            return list(self._list)
-
-    async def pop(self):
-        async with self._lock:
-            if self._list:
-                return self._list.pop(0)
-            return None
+from app_types import AsyncList
 
 
 def pattern_filter(
@@ -176,8 +152,7 @@ async def crawler(
         addable_urls.sort()
 
         # Retrieve seen urls
-        print(type(seen_urls), isinstance(seen_urls, AsyncList))
-        if isinstance(seen_urls, AsyncList):
+        if type(seen_urls) == AsyncList:
             all_urls = await seen_urls.get_all()
         else:
             all_urls = seen_urls[:]
