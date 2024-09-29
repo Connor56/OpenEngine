@@ -39,7 +39,7 @@ def start_ephemeral_postgres() -> Tuple[tempfile.TemporaryDirectory, str]:
     return temp_dir, port
 
 
-def stop_ephemeral_postgres(temp_dir):
+def stop_ephemeral_postgres(temp_dir: tempfile.TemporaryDirectory):
     """
     Uses the temporary directory and port from
     start_ephemeral_postgres to stop the postgres server.
