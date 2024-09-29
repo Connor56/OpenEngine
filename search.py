@@ -8,43 +8,43 @@ Created:
 """
 
 import sentence_transformers
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import ScoredPoint
 from typing import List, Dict, Any
 import numpy as np
+import asyncpg
 
 
-def search(
+async def get_top_matches(
     query: str,
     model: sentence_transformers.SentenceTransformer,
-    db_client: QdrantClient,
+    vector_client: AsyncQdrantClient,
+    postgres_client: asyncpg.Connection,
+    limit: int = 50,
+    match_limit: int = 30,
 ) -> List[Dict[str, Any]]:
     """
-    Searches the qdrant database for the query and returns the
-    results.
-
-    Parameters
-    ----------
-    query : str
-        The query to search for.
-
-    model : sentence_transformers.SentenceTransformer
-        The sentence_transformers model to use for searching.
-
-    db_client : QdrantClient
-        The Qdrant client to use for searching.
-
-    Returns
-    -------
-    List[Dict[str, Any]]
-        A list of dictionaries containing the results of the search.
+    Search the qdrant database for the query and returns the
     """
-    vec = model.encode(query, convert_to_numpy=True)
-    hits = db_client.search(
-        collection_name="search",
-        query_vector=vec,
-        limit=5,  # Return 5 closest points
-    )
+    # Embed the query
+    search_vector = model.encode(query, convert_to_numpy=True)
+
+    # Get the matches
+    matches = await fetch_matches(vector_client, search_vector, limit=limit)
+
+    # Get the best urls by summing scores
+    urls = {}
+    for match in matches:
+        url = match.payload["text"]["url"]
+        if url in urls:
+            urls[url] += match.score
+        else:
+            urls[url] = match.score
+
+    # Order the urls by summed score
+    top_urls = sorted(urls.items(), key=lambda x: x[1], reverse=True)
+
+    return top_urls[:match_limit]
 
 
 async def fetch_matches(
