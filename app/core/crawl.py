@@ -16,7 +16,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 from process import Response
 from utility import get_base_site, clean_urls, handle_relative_url
-from app_types import AsyncList
+from app.models.app_types import AsyncList
 
 
 def pattern_filter(

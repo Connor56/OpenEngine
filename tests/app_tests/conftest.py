@@ -50,7 +50,10 @@ def base_postgres_details():
     A fixture that sets up a postgres database to be connected to
     during testing.
     """
-    from setup_postgres import start_ephemeral_postgres, stop_ephemeral_postgres
+    from tests.app_tests.setup_postgres import (
+        start_ephemeral_postgres,
+        stop_ephemeral_postgres,
+    )
 
     try:
         # Start a temporary PostgreSQL server

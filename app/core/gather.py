@@ -12,7 +12,7 @@ import sentence_transformers
 import asyncpg
 import asyncio
 from crawl import pattern_filter, crawler
-from app_types import AsyncList
+from app.models.app_types import AsyncList
 from process import process
 import datetime
 import httpx
