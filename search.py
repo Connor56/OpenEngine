@@ -48,7 +48,7 @@ async def get_top_matches(
 
 
 async def fetch_matches(
-    vector_client: QdrantClient,
+    vector_client: AsyncQdrantClient,
     search_vector: np.ndarray,
     limit: int = 50,
 ) -> List[ScoredPoint]:
