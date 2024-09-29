@@ -53,9 +53,7 @@ async def test_gather(
     assert len(points) == 4
 
     # Check the database has the correct number of resources
-    cursor = db_client.cursor()
-    cursor.execute("SELECT * FROM resources")
-    results = cursor.fetchall()
+    results = await db_client.fetch("SELECT * FROM resources")
     assert len(results) == 5
 
     # Check the set of urls stored is the same

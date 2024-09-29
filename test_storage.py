@@ -4,9 +4,6 @@ import qdrant_client
 import numpy as np
 from qdrant_client.models import VectorParams, Distance
 from datetime import datetime
-import psycopg2
-from setup_postgres import start_ephemeral_postgres, stop_ephemeral_postgres
-import os
 
 
 @pytest.mark.asyncio
@@ -129,15 +126,11 @@ async def test_log_resource(empty_postgres_client):
     # Get the postgres client
     db_client = empty_postgres_client
 
-    cursor = db_client.cursor()
-
     # Log the resource
     await st.log_resource(resource, db_client)
 
     # Get the resource from the database
-    cursor.execute("SELECT * FROM resources")
-
-    results = cursor.fetchall()
+    results = await db_client.fetch("SELECT * FROM resources")
 
     # Was it added correctly?
     assert len(results) == 1

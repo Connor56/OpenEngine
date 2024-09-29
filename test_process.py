@@ -59,9 +59,7 @@ async def test_process(
     }
 
     # Check the postgres client has a record
-    cursor = empty_postgres_client.cursor()
-    cursor.execute("SELECT * FROM resources")
-    results = cursor.fetchall()
+    results = await empty_postgres_client.fetch("SELECT * FROM resources")
 
     assert len(results) == 1
     assert results[0][0] == 1
@@ -132,9 +130,7 @@ async def test_process_with_empty_links(
     }
 
     # Check the postgres client has a record
-    cursor = empty_postgres_client.cursor()
-    cursor.execute("SELECT * FROM resources")
-    results = cursor.fetchall()
+    results = await empty_postgres_client.fetch("SELECT * FROM resources")
 
     assert len(results) == 1
     assert results[0][0] == 1
