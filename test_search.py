@@ -4,6 +4,30 @@ import time
 
 
 @pytest.mark.asyncio
+async def test_get_top_matches(
+    search_vector_client,
+    embedding_model,
+):
+    """
+    Test the correct urls are returned to the search function.
+    """
+
+    query = "What's the best form of energy available to every consumer in the world?"
+
+    top_urls = await search.get_top_matches(
+        query,
+        embedding_model,
+        search_vector_client,
+        None,
+    )
+
+    for key, value in top_urls:
+        print(key, value)
+
+    assert False
+
+
+@pytest.mark.asyncio
 async def test_fetch_matches(search_vector_client, embedding_model):
     """
     Tests the fetch_matches function correctly returns the closest matches.
@@ -45,8 +69,3 @@ async def test_fetch_matches(search_vector_client, embedding_model):
     assert scores[0] == 0.5294554233551025
     assert scores[1] == 0.5173807144165039
     assert scores[2] == 0.5152561664581299
-
-
-@pytest.mark.asyncio
-async def test_(search_vector_client, embedding_model):
-    pass
