@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Optional
 from storage import store_embedding, Resource, log_resource
 import asyncio
-from psycopg2.extensions import connection
+import asyncpg
 from datetime import datetime
 from utility import clean_urls, handle_relative_url, get_base_site
 
@@ -33,7 +33,7 @@ async def process(
     response_queue: asyncio.Queue,
     model: sentence_transformers.SentenceTransformer,
     vector_client: AsyncQdrantClient,
-    db_client: connection,
+    db_client: asyncpg.Connection,
     pause: asyncio.Event,
     end: asyncio.Event,
     max_iter: Optional[int] = -1,

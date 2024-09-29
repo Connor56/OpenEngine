@@ -9,7 +9,7 @@ Created:
 
 from qdrant_client import AsyncQdrantClient
 import sentence_transformers
-import psycopg2
+import asyncpg
 import asyncio
 from crawl import pattern_filter, crawler
 from app_types import AsyncList
@@ -22,7 +22,7 @@ from typing import List
 
 async def gather(
     vector_client: AsyncQdrantClient,
-    db_client: psycopg2.extensions.connection,
+    db_client: asyncpg.Connection,
     model: sentence_transformers.SentenceTransformer,
     revisit_delta: datetime.timedelta = datetime.timedelta(days=1),
     max_iter: int = -1,
@@ -38,7 +38,7 @@ async def gather(
     vector_client : QdrantClient
         The Qdrant client to use for storing vectors.
 
-    db_client : psycopg2.extensions.connection
+    db_client : asyncpg.Connection
         The PostgreSQL client to use for storing data.
 
     model : sentence_transformers.SentenceTransformer
@@ -77,9 +77,7 @@ async def gather(
     client = httpx.AsyncClient(follow_redirects=True)
 
     # Get all the urls from the postgres database
-    cursor = db_client.cursor()
-    cursor.execute("SELECT url, lastVisited FROM resources")
-    all_urls = cursor.fetchall()
+    all_urls = await db_client.fetch("SELECT url, lastVisited FROM resources")
 
     # Filter out the urls to be revisited
     current_time = datetime.datetime.now()

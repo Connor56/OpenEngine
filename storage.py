@@ -12,7 +12,7 @@ from qdrant_client.models import VectorParams, Distance, PointStruct
 import numpy as np
 from dataclasses import dataclass
 from datetime import datetime
-import psycopg2
+import asyncpg
 from uuid import uuid4
 
 
@@ -97,7 +97,7 @@ async def store_embedding(
 
 async def log_resource(
     resource: Resource,
-    db_client: psycopg2.extensions.connection,
+    db_client: asyncpg.Connection,
 ) -> bool:
     """
     Logs information about a resource to the postgres database, if it isn't already
@@ -127,11 +127,10 @@ async def log_resource(
 
     # Log the resource to the database
     try:
-        cursor = db_client.cursor()
 
-        cursor.execute(
-            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
-            attributes,
+        await db_client.execute(
+            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES ($1, $2, $3, $4, $5)",
+            *attributes,
         )
 
         return True
