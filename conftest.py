@@ -5,6 +5,8 @@ import http.server
 import socketserver
 import threading
 from pathlib import Path
+import asyncpg
+from typing import Tuple
 
 
 # Fixture to start and stop the local HTTP server
@@ -43,12 +45,11 @@ def local_site():
 
 
 @pytest.fixture(scope="session")
-def base_postgres_client():
+def base_postgres_details():
     """
-    A fixture that provides a session created postgres client for
-    testing, that can be re-used and speed up testing time.
+    A fixture that sets up a postgres database to be connected to
+    during testing.
     """
-    import psycopg2
     from setup_postgres import start_ephemeral_postgres, stop_ephemeral_postgres
 
     try:
@@ -56,20 +57,7 @@ def base_postgres_client():
         print("starting postgres")
         temp_dir, port = start_ephemeral_postgres()
 
-        # Connect to the temporary PostgreSQL server
-        client = psycopg2.connect(
-            dbname="postgres", user="postgres", host="localhost", port=port
-        )
-
-        print("connected to postgres")
-
-        yield client
-
-        client.close()
-
-    except Exception as e:
-        print(e)
-        stop_ephemeral_postgres(temp_dir)
+        yield port
 
     finally:
         print("cleaning up")
@@ -77,68 +65,101 @@ def base_postgres_client():
         stop_ephemeral_postgres(temp_dir)
 
 
-@pytest.fixture(scope="function")
-def empty_postgres_client(base_postgres_client):
+@pytest_asyncio.fixture(scope="function")
+async def empty_postgres_client(base_postgres_details: str):
     """
     A fixture that puts an empty resources table into the postgres
     client and provides it for testing. Then drops the table once
     the function is complete.
     """
 
-    cursor = base_postgres_client.cursor()
+    # Get the port details
+    port = base_postgres_details
 
-    # Create the table
-    table_sql = """CREATE TABLE resources ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        firstVisited TIMESTAMP NOT NULL,
-        lastVisited TIMESTAMP NOT NULL,
-        allVisits INT DEFAULT 1,
-        externalLinks TEXT[]
-    );"""
+    try:
+        # Connect to the temporary PostgreSQL server
+        client = await asyncpg.connect(
+            database="postgres",
+            user="postgres",
+            host="localhost",
+            port=port,
+        )
 
-    cursor.execute(table_sql)
+        print("connected to postgres")
 
-    yield base_postgres_client
+        # Create the table
+        table_sql = """CREATE TABLE resources ( 
+            id SERIAL PRIMARY KEY,
+            url VARCHAR(2048) NOT NULL,
+            firstVisited TIMESTAMP NOT NULL,
+            lastVisited TIMESTAMP NOT NULL,
+            allVisits INT DEFAULT 1,
+            externalLinks TEXT[]
+        );"""
 
-    cursor.execute("DROP TABLE resources")
+        await client.execute(table_sql)
+
+        yield client
+
+    finally:
+
+        await client.execute("DROP TABLE resources")
+
+        await client.close()
 
 
-@pytest.fixture(scope="function")
-def populated_postgres_client(base_postgres_client):
+@pytest_asyncio.fixture(scope="function")
+async def populated_postgres_client(base_postgres_details: str):
     """
     A fixture that provides a psycopg2 client for testing and a the function for killing
     the server once the user is complete.
     """
-    cursor = base_postgres_client.cursor()
 
-    # Create the table
-    table_sql = """CREATE TABLE resources ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        firstVisited TIMESTAMP NOT NULL,
-        lastVisited TIMESTAMP NOT NULL,
-        allVisits INT DEFAULT 1,
-        externalLinks TEXT[]
-    );"""
+    # Get the port details
+    port = base_postgres_details
 
-    cursor.execute(table_sql)
+    try:
+        # Connect to the temporary PostgreSQL server
+        client = await asyncpg.connect(
+            database="postgres",
+            user="postgres",
+            host="localhost",
+            port=port,
+        )
 
-    # Insert a resource
-    cursor.execute(
-        "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
-        (
-            "https://caseyhandmer.wordpress.com/",
-            datetime.now(),
-            datetime.now(),
-            1,
-            [],
-        ),
-    )
+        print("connected to postgres")
 
-    yield base_postgres_client
+        # Create the table
+        table_sql = """CREATE TABLE resources ( 
+            id SERIAL PRIMARY KEY,
+            url VARCHAR(2048) NOT NULL,
+            firstVisited TIMESTAMP NOT NULL,
+            lastVisited TIMESTAMP NOT NULL,
+            allVisits INT DEFAULT 1,
+            externalLinks TEXT[]
+        );"""
 
-    cursor.execute("DROP TABLE resources")
+        await client.execute(table_sql)
+
+        # Insert a resource
+        await client.execute(
+            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
+            (
+                "https://caseyhandmer.wordpress.com/",
+                datetime.now(),
+                datetime.now(),
+                1,
+                [],
+            ),
+        )
+
+        yield client
+
+    finally:
+
+        await client.execute("DROP TABLE resources")
+
+        await client.close()
 
 
 @pytest.fixture(scope="session")
