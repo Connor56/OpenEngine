@@ -1,8 +1,8 @@
 import pytest
-import gather
+import app.core.gather as gather
 from qdrant_client.models import VectorParams, Distance
 import datetime
-import storage as st
+import app.core.storage as st
 
 
 @pytest.mark.asyncio
@@ -23,7 +23,7 @@ async def test_gather(
     db_client = empty_postgres_client
 
     # Store the url in the postgres database
-    await st.log_resource(
+    stored = await st.log_resource(
         resource=st.Resource(
             url=server_url,
             firstVisited=datetime.datetime.now(),
@@ -33,6 +33,8 @@ async def test_gather(
         ),
         db_client=db_client,
     )
+
+    assert stored
 
     await gather.gather(
         vector_client,

@@ -1,5 +1,5 @@
 import pytest
-import storage as st
+import app.core.storage as st
 import qdrant_client
 import numpy as np
 from qdrant_client.models import VectorParams, Distance

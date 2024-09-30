@@ -1,5 +1,5 @@
 import pytest
-import search
+import app.core.search as search
 import time
 
 

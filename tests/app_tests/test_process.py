@@ -1,5 +1,5 @@
 import pytest
-import process
+import app.core.process as process
 import asyncio
 from bs4 import BeautifulSoup
 

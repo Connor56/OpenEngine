@@ -1,5 +1,5 @@
 import pytest
-import utility
+import app.core.utility as utility
 
 
 def test_clean_urls():
@@ -43,9 +43,7 @@ def test_handle_relative_url():
     Test the handle_relative_url function correctly handles relative
     urls.
     """
-    current_url = (
-        "https://caseyhandmer.wordpress.com/test_data/simple_site/page1.html"
-    )
+    current_url = "https://caseyhandmer.wordpress.com/test_data/simple_site/page1.html"
     base_site = "https://caseyhandmer.wordpress.com"
 
     # Test relative url
@@ -58,9 +56,7 @@ def test_handle_relative_url():
 
     # Test relative url with query string
     relative_url = "page2.html"
-    expected_url = (
-        "https://caseyhandmer.wordpress.com/test_data/simple_site/page2.html"
-    )
+    expected_url = "https://caseyhandmer.wordpress.com/test_data/simple_site/page2.html"
     assert (
         utility.handle_relative_url(relative_url, current_url, base_site)[0]
         == expected_url
@@ -72,9 +68,7 @@ def test_handle_relative_url():
     Test the handle_relative_url function correctly deals with
     empty string urls
     """
-    current_url = (
-        "https://caseyhandmer.wordpress.com/test_data/simple_site/page1.html"
-    )
+    current_url = "https://caseyhandmer.wordpress.com/test_data/simple_site/page1.html"
     base_site = "https://caseyhandmer.wordpress.com"
 
     relative_url = ""

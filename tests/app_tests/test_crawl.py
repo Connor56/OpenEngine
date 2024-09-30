@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 import httpx
-import crawl
+import app.core.crawl as crawl
 
 
 @pytest.mark.asyncio
