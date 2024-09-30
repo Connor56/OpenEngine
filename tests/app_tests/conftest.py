@@ -8,7 +8,7 @@ from pathlib import Path
 import asyncpg
 from typing import Tuple
 import requests
-import time
+import os
 
 
 # Fixture to start and stop the local HTTP server
@@ -221,7 +221,10 @@ async def search_vector_client(base_vector_client):
         vectors_config=VectorParams(size=384, distance=Distance.COSINE),
     )
 
-    vectors = load("test_data/search_data/qdrant_vectors.joblib")
+    # Current file path for relative imports regardless of location
+    file_path = os.path.dirname(__file__)
+
+    vectors = load(f"{file_path}/test_data/search_data/qdrant_vectors.joblib")
     await base_vector_client.upsert(
         collection_name="embeddings",
         points=vectors,
@@ -251,5 +254,8 @@ def soup():
     from bs4 import BeautifulSoup
     from joblib import load
 
-    soup = load("test_data/html_page.joblib")
+    # Current file path for relative imports regardless of location
+    file_path = os.path.dirname(__file__)
+
+    soup = load(f"{file_path}/test_data/html_page.joblib")
     return soup
