@@ -14,11 +14,11 @@ from qdrant_client import AsyncQdrantClient
 import sentence_transformers
 from dataclasses import dataclass
 from typing import Optional
-from storage import store_embedding, Resource, log_resource
+from .storage import store_embedding, Resource, log_resource
 import asyncio
 import asyncpg
 from datetime import datetime
-from utility import clean_urls, handle_relative_url, get_base_site
+from .utility import clean_urls, handle_relative_url, get_base_site
 
 
 @dataclass

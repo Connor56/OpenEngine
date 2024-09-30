@@ -11,9 +11,9 @@ from qdrant_client import AsyncQdrantClient
 import sentence_transformers
 import asyncpg
 import asyncio
-from crawl import pattern_filter, crawler
+from .crawl import pattern_filter, crawler
 from app.models.app_types import AsyncList
-from process import process
+from .process import process
 import datetime
 import httpx
 from urllib.parse import urlparse

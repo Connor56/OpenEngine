@@ -14,8 +14,8 @@ from bs4 import BeautifulSoup
 from typing import List
 import re
 from urllib.parse import urlparse, urlunparse
-from process import Response
-from utility import get_base_site, clean_urls, handle_relative_url
+from .process import Response
+from .utility import get_base_site, clean_urls, handle_relative_url
 from app.models.app_types import AsyncList
 
 
