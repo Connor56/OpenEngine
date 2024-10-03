@@ -1,4 +1,5 @@
 <script>
+<script lang="ts">
 	let query = '';
 
 	function handleSearch() {
