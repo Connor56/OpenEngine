@@ -1,5 +1,6 @@
-<script>
 <script lang="ts">
+	import SearchBar from '$lib/components/SearchBar.svelte';
+
 	let query = '';
 
 	function handleSearch() {
@@ -7,51 +8,23 @@
 		window.location.href = `/results?query=${encodeURIComponent(query)}`;
 	}
 
-	function handleKeyPress(event) {
+	const handleKeyPress = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
 			handleSearch();
 		}
-	}
+	};
 </script>
 
-<div class="search-bar">
-	<input
-		type="text"
-		class="search-input"
-		bind:value={query}
-		on:keypress={handleKeyPress}
-		placeholder="Search..."
-	/>
+<div class="search-container">
+	<SearchBar {handleKeyPress} />
 </div>
 
 <style>
-	/* Your styles here */
-	.search-bar {
+	.search-container {
 		display: flex;
 		justify-content: center;
 		height: 100vh;
 		align-items: center;
-	}
-
-	.search-input {
-		width: 550px;
-		height: 24px;
-		padding: 10px 20px;
-		font-size: 18px;
-		border-radius: 100px;
-		border: 1px solid #dfe1e5;
-	}
-
-	.search-input:focus {
-		outline: none;
-		border: 1px solid rgb(255, 255, 255);
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-	}
-
-	.search-input:hover {
-		outline: none;
-		border: 1px solid #ffffff;
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 	}
 
 	:global(body) {
