@@ -1,10 +1,23 @@
-<script>
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import SearchBar from '$lib/components/SearchBar.svelte';
+	import type { Result } from '$lib/types';
+	import ResultCard from '$lib/components/ResultCard.svelte';
 
 	let query = '';
-	let results = ['hi'];
+	let results: Result[] = [
+		{
+			title: 'Example Title',
+			siteName: 'Example Site Name',
+			url: 'https://example.com',
+			snippet:
+				'This url will take you to places you could never even imagine, its a place where you can be yourself and be free.',
+			score: 0.5,
+			favicon_location: 'github.webp',
+			published: '01 July 2020'
+		}
+	];
 
 	$: query = $page.url.searchParams.get('query') || '';
 
@@ -32,20 +45,24 @@
 			console.error('Error:', error);
 		}
 	}
+
+	const handleKeyPress = (event: KeyboardEvent) => {
+		if (event.key === 'Enter') {
+			alert('you pressed enter');
+		}
+	};
 </script>
 
-<div class="search-container">
-	<h1>Search Results</h1>
-	<input type="text" bind:value={query} placeholder="Enter a search query" />
+<div class="top-bar horizontal-alignment">
+	<SearchBar {handleKeyPress} />
 </div>
+<hr />
 
-<div class="results-container">
+<div class="results-container horizontal-alignment">
 	{#if results.length > 0}
 		{#each results as result}
 			<div class="result-item">
-				<a class="result-title" href={result.url} target="_blank">{result.title}</a>
-				<div class="result-url">{result.url}</div>
-				<div class="result-snippet">{result.snippet}</div>
+				<ResultCard {result} />
 			</div>
 		{/each}
 	{:else}
@@ -54,29 +71,36 @@
 </div>
 
 <style>
-	/* Your styles here */
+	.top-bar {
+		margin-top: 30px;
+		margin-bottom: 56px;
+	}
+
+	.horizontal-alignment {
+		margin-left: 150px;
+		max-width: 600px;
+	}
+
+	hr {
+		width: 100%; /* Makes the rule span the entire width of the page */
+		border: none; /* Removes the default border */
+		border-top: 1px solid #dfe1e5; /* Adds a custom border (you can adjust thickness and color) */
+		margin: 0; /* Removes any default margin */
+	}
+
+	.full-width-rule {
+		width: 100%; /* Makes the rule span the entire width of the page */
+		border: none; /* Removes the default border */
+		border-top: 1px solid black; /* Adds a custom border (you can adjust thickness and color) */
+		margin: 0; /* Removes any default margin */
+	}
+
 	.results-container {
-		margin: 50px auto;
-		width: 60%;
+		margin-top: 30px;
 	}
 
-	.result-item {
-		margin-bottom: 20px;
-	}
-
-	.result-title {
-		font-size: 18px;
-		color: #1a0dab;
-		text-decoration: none;
-	}
-
-	.result-url {
-		font-size: 14px;
-		color: #006621;
-	}
-
-	.result-snippet {
-		font-size: 14px;
-		color: #545454;
+	:global(body) {
+		background-color: #ffffff;
+		margin: 0;
 	}
 </style>
