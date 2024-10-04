@@ -8,7 +8,7 @@
 	<div class="select-on-hover">
 		<a class="result-card-link" href={result.url}>
 			<div class="result-card-header">
-				<img class="result-card-favicon" src={result.favicon_location} alt="favicon" />
+				<img class="result-card-favicon" src={result.faviconLocation} alt="favicon" />
 				<div class="result-card-overview">
 					<div class="overview-site-name">{result.siteName}</div>
 					<div class="overview-url">{result.url}</div>

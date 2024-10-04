@@ -4,6 +4,6 @@ export type Result = {
 	url: string;
 	snippet: string;
 	score: number;
-	favicon_location: string;
+	faviconLocation: string;
 	published: string;
 };
