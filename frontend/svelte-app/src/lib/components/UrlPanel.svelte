@@ -1,28 +1,26 @@
 <script lang="ts">
-	import type { Link } from '$lib/types';
+	import type { Url } from '$lib/types';
+	import UrlCard from './UrlCard.svelte';
 
-	export let links: Link[];
+	export let seedUrls: Url[];
 </script>
 
-<div class="link-panel">
-	{#each links as link}
-		<div class="link-item">
-			<a class="link-title" href={link.url}>{link.title}</a>
-			<div class="link-url">{link.url}</div>
-		</div>
+<div class="url-panel">
+	{#each seedUrls as url}
+		<UrlCard {url} />
 	{/each}
 </div>
 
 <style>
-	.link-panel {
+	.url-panel {
 		margin-top: 30px;
 	}
 
-	.link-item {
+	.url-item {
 		margin-bottom: 20px;
 	}
 
-	.link-title {
+	.url-title {
 		font-size: 18px;
 		color: #368aff;
 		text-decoration: none;
@@ -34,15 +32,15 @@
 		margin-bottom: 8px;
 	}
 
-	.link-title:hover {
+	.url-title:hover {
 		text-decoration: underline;
 	}
 
-	.link-title:visited {
+	.url-title:visited {
 		color: #b45eff;
 	}
 
-	.link-url {
+	.url-url {
 		font-size: 14px;
 		color: #191919;
 		margin-top: 0;
