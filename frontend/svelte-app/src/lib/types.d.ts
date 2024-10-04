@@ -7,3 +7,8 @@ export type Result = {
 	faviconLocation: string;
 	published: string;
 };
+
+export type Url = {
+	url: string;
+	faviconLocation: string;
+}
