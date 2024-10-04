@@ -34,6 +34,35 @@
 				<div class="url-investigation standard-pane">
 					<h2>Investigate Urls</h2>
 				</div>
+		{:else if adminLocation === 'crawl'}
+			<div class="crawl-grid">
+				<div class="crawl-options-pane standard-pane">
+					<h2>Options</h2>
+				</div>
+				<div class="crawl-tracking-pane standard-pane">
+					<h2>Tracker</h2>
+				</div>
+				<div class="crawl-control-pane standard-pane">
+					<h2>Controls</h2>
+					<Button
+						label="Start Crawl"
+						color="#28b828"
+						hoverBackgroundColor="#28b828"
+						handleClick={() => alert('start crawl')}
+					/>
+					<Button
+						label="Stop Crawl"
+						color="#b82828"
+						hoverBackgroundColor="#b82828"
+						handleClick={() => alert('stop crawl')}
+					/>
+					<Button
+						label="Pause Crawl"
+						color="#d5890f"
+						hoverBackgroundColor="#d5890f"
+						handleClick={() => alert('pause crawl')}
+					/>
+				</div>
 				<div class=""></div>
 			</div>
 		</div>
@@ -95,14 +124,35 @@
 		display: flex;
 		height: 100%;
 		margin-bottom: 0px;
+	.crawl-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		grid-template-rows: repeat(1, 1fr);
+		grid-gap: 40px;
+		padding: 20px;
+		flex-grow: 1;
 	}
 
+	.crawl-options-pane {
+		grid-column: 1;
+		grid-row: 1 / span 1;
 	}
 
+	.crawl-tracking-pane {
+		grid-column: 2 / span 2;
+		grid-row: 1 / span 1;
 	}
 
+	.craw-control-pane {
+		grid-column: 5;
+		grid-row: 1 / span 1;
 	}
 
+	.admin-container {
+		margin: 30px 40px;
+		display: flex;
+		height: 100%;
+		margin-bottom: 0px;
 	}
 
 	:global(body) {
