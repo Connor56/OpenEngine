@@ -105,13 +105,6 @@
 		margin: 0; /* Removes any default margin */
 	}
 
-	.full-width-rule {
-		width: 100%; /* Makes the rule span the entire width of the page */
-		border: none; /* Removes the default border */
-		border-top: 1px solid black; /* Adds a custom border (you can adjust thickness and color) */
-		margin: 0; /* Removes any default margin */
-	}
-
 	.results-container {
 		margin-top: 30px;
 	}
