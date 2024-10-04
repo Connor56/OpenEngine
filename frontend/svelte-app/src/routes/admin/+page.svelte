@@ -34,6 +34,7 @@
 				<div class="url-investigation standard-pane">
 					<h2>Investigate Urls</h2>
 				</div>
+			</div>
 		{:else if adminLocation === 'crawl'}
 			<div class="crawl-grid">
 				<div class="crawl-options-pane standard-pane">
@@ -65,14 +66,12 @@
 				</div>
 				<div class=""></div>
 			</div>
-		</div>
-	{:else if adminLocation === 'crawl'}
-		<div>Crawl</div>
-	{:else if adminLocation === 'metrics'}
-		<div>Metrics</div>
-	{:else if adminLocation === 'settings'}
-		<div>Settings</div>
-	{/if}
+		{:else if adminLocation === 'metrics'}
+			<div>Metrics</div>
+		{:else if adminLocation === 'settings'}
+			<div>Settings</div>
+		{/if}
+	</div>
 </container>
 
 <style>
