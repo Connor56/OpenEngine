@@ -89,6 +89,13 @@
 	.horizontal-alignment {
 		margin-left: 150px;
 		max-width: 600px;
+		min-width: 600px;
+	}
+
+	@media (max-width: 1000px) {
+		.horizontal-alignment {
+			margin-left: clamp(20px, 45% - 300px, 15%);
+		}
 	}
 
 	hr {
