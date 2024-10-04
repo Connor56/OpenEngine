@@ -80,6 +80,13 @@
 		margin-top: 0px;
 	}
 
+	.admin-container {
+		margin: 30px 40px;
+		display: flex;
+		height: 100%;
+		margin-bottom: 0px;
+	}
+
 	.seed-url-grid {
 		display: grid;
 		grid-template-columns: 3fr 5fr;
@@ -118,12 +125,6 @@
 		height: 100vh;
 	}
 
-	/* Your styles here */
-	.admin-container {
-		margin: 30px 40px;
-		display: flex;
-		height: 100%;
-		margin-bottom: 0px;
 	.crawl-grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
