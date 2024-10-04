@@ -37,6 +37,13 @@
 				<div class=""></div>
 			</div>
 		</div>
+	{:else if adminLocation === 'crawl'}
+		<div>Crawl</div>
+	{:else if adminLocation === 'metrics'}
+		<div>Metrics</div>
+	{:else if adminLocation === 'settings'}
+		<div>Settings</div>
+	{/if}
 </container>
 
 <style>
