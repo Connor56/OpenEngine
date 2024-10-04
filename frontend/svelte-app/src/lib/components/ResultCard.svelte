@@ -24,7 +24,7 @@
 
 <style>
 	.result-card {
-		margin-bottom: 20px;
+		margin-bottom: 40px;
 	}
 
 	.result-card-link {
