@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	export let handleNav: () => void;
+	export let handleNav: (event: Event) => void;
 </script>
 
 <div class="top-nav-container">
