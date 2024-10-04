@@ -16,6 +16,16 @@
 			score: 0.5,
 			favicon_location: 'github.webp',
 			published: '01 July 2020'
+		},
+		{
+			title: 'wing wong ding dong',
+			siteName: 'The place od darkness',
+			url: 'https://example.co',
+			snippet:
+				'This url will take you to places you could never even imagine, its a place where you can be yourself and be free.',
+			score: 0.4,
+			favicon_location: 'favicon.png',
+			published: '01 July 2023'
 		}
 	];
 
