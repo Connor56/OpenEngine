@@ -1,9 +1,12 @@
 <script lang="ts">
+	import AdminTopNav from '$lib/components/AdminTopNav.svelte';
 
 	let seedUrls = ['https://an_url.com'];
 	let newUrl = '';
 </script>
 
+<AdminTopNav />
+<div class="admin-container"></div>
 
 <style>
 	/* Your styles here */
@@ -31,5 +34,10 @@
 	.add-url input {
 		flex: 1;
 		margin-right: 10px;
+	}
+
+	:global(body) {
+		background-color: #ffffff;
+		margin: 0;
 	}
 </style>
