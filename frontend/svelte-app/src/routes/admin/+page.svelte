@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AdminTopNav from '$lib/components/AdminTopNav.svelte';
 	import UrlPanel from '$lib/components/UrlPanel.svelte';
+	import Button from '$lib/components/Button.svelte';
 	import type { Url } from '$lib/types';
 
 	let seedUrls: Url[] = [
@@ -17,16 +18,26 @@
 		const target = event.target as HTMLElement;
 		adminLocation = target.id;
 	}
+
+	function handleDelete(index: number) {
+		let removedUrl = seedUrls[index];
+		seedUrls = seedUrls.filter((_, i) => i !== index);
+	}
+
+	function handleSelect(index: number) {
+		let selectedUrl = seedUrls[index];
+		alert(selectedUrl.url);
+	}
 </script>
 
 <container>
 	<AdminTopNav {handleNav} />
-	{#if adminLocation === 'seed-urls'}
-		<div class="admin-container">
+	<div class="admin-container">
+		{#if adminLocation === 'seed-urls'}
 			<div class="seed-url-grid">
 				<div class="seed-url-pane standard-pane">
 					<h2>Seed Urls</h2>
-					<UrlPanel {seedUrls} />
+					<UrlPanel {seedUrls} {handleDelete} {handleSelect} />
 				</div>
 				<div class="url-meta standard-pane">
 					<h2>Url Metadata</h2>
