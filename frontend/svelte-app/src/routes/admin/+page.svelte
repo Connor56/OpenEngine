@@ -97,25 +97,12 @@
 		margin-bottom: 0px;
 	}
 
-	.url-list {
-		list-style: none;
-		padding: 0;
 	}
 
-	.url-item {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 10px;
 	}
 
-	.add-url {
-		display: flex;
-		margin-bottom: 20px;
 	}
 
-	.add-url input {
-		flex: 1;
-		margin-right: 10px;
 	}
 
 	:global(body) {
