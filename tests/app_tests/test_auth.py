@@ -11,7 +11,9 @@ async def test_set_credentials(
 ):
     """
     Check if the set_credentials function correctly sets the
-    credentials of an admin user.
+    credentials of an admin user, and won't set more credentials if
+    one already exists and a valid JWT isn't provided with the
+    function call.
     """
 
     # Username and password to use
@@ -31,6 +33,27 @@ async def test_set_credentials(
     assert result is not None
     assert result["username"] == username
     assert PasswordHasher().verify(password_hash, password)
+
+    # Username and password to use
+    password = "password2"
+    username = "admin2"
+
+    # Attempt to set the credentials
+    was_set = await auth.set_credentials(
+        username,
+        password,
+        empty_postgres_client,
+    )
+
+    # Check the function says the credentials weren't set
+    assert not was_set
+
+    # Check the credentials aren't in postgres
+    query = "SELECT * FROM admins"
+    result = await empty_postgres_client.fetch(query)
+
+    assert len(result) == 1
+    assert result[0]["username"] != username
 
 
 @pytest.mark.asyncio
