@@ -110,11 +110,21 @@ async def empty_postgres_client(base_postgres_details: str):
 
         await client.execute(resources_sql)
 
+        # Create the table
+        admins_sql = """CREATE TABLE admins ( 
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(2048) NOT NULL,
+            password VARCHAR(2048) NOT NULL
+        );"""
+
+        await client.execute(admins_sql)
+
         yield client
 
     finally:
 
         await client.execute("DROP TABLE resources")
+        await client.execute("DROP TABLE admins")
 
         await client.close()
 
