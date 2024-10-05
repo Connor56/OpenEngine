@@ -4,3 +4,6 @@ notes*
 
 # MacOS files
 *.DS_Store
+
+# Environment variables
+*.env
