@@ -99,7 +99,7 @@ async def empty_postgres_client(base_postgres_details: str):
         print("connected to postgres")
 
         # Create the table
-        table_sql = """CREATE TABLE resources ( 
+        resources_sql = """CREATE TABLE resources ( 
             id SERIAL PRIMARY KEY,
             url VARCHAR(2048) NOT NULL,
             firstVisited TIMESTAMP NOT NULL,
@@ -108,7 +108,7 @@ async def empty_postgres_client(base_postgres_details: str):
             externalLinks TEXT[]
         );"""
 
-        await client.execute(table_sql)
+        await client.execute(resources_sql)
 
         yield client
 
@@ -243,7 +243,9 @@ def embedding_model():
     """
     import sentence_transformers
 
-    return sentence_transformers.SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
+    return sentence_transformers.SentenceTransformer(
+        "multi-qa-MiniLM-L6-cos-v1"
+    )
 
 
 @pytest.fixture(scope="function")
