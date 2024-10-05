@@ -6,6 +6,7 @@ Created:
     2024-10-05
 """
 
+import jwt
 from typing import Optional
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -15,6 +16,11 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 load_dotenv(dotenv_path="../../.env")
+
+# Secret key and algorithm used to encode/decode JWT
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 async def set_credentials(
@@ -96,4 +102,61 @@ async def check_credentials(
 
     except VerifyMismatchError:
         print("Password is incorrect")
+        return False
+
+
+# Generate JWT token
+def create_access_token(
+    data: dict,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    """
+    Creates a JWT token with the users information.
+
+    Parameters
+    ----------
+    data : dict
+        The data to encode in the token.
+
+    expires_delta : Optional[timedelta], optional
+        The expiration time for the token, by default None.
+
+    Returns
+    -------
+    str
+        The JWT token.
+    """
+    # Data to encode in the token
+    to_encode = data.copy()
+
+    # Set the expiration date for the token
+    if expires_delta:
+        expire = datetime.now() + expires_delta
+    else:
+        expire = datetime.now() + timedelta(minutes=15)
+
+    # Add to the encode dictionary
+    to_encode |= {"exp": expire}
+
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def check_access_token(token: str) -> bool:
+    """
+    Checks if the access token is valid.
+
+    Parameters
+    ----------
+    token : str
+        The access token to check.
+
+    Returns
+    -------
+    bool
+        True if the token is valid, False otherwise.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return True
+    except jwt.JWTError:
         return False
