@@ -7,7 +7,10 @@ import app.core.storage as st
 
 @pytest.mark.asyncio
 async def test_gather(
-    empty_postgres_client, vector_client, embedding_model, local_site
+    empty_postgres_client,
+    vector_client,
+    embedding_model,
+    local_site,
 ):
     """
     Test the gather function correctly crawls a website and returns
