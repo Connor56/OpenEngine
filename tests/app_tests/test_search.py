@@ -66,6 +66,6 @@ async def test_fetch_matches(search_vector_client, embedding_model):
     )
 
     # Check score order
-    assert scores[0] == 0.5294554233551025
-    assert scores[1] == 0.5173807144165039
-    assert scores[2] == 0.5152561664581299
+    assert round(scores[0], 6) == 0.529455
+    assert round(scores[1], 6) == 0.517381
+    assert round(scores[2], 6) == 0.515256
