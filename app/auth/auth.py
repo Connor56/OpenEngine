@@ -180,7 +180,18 @@ def check_access_token(token: str) -> bool:
         True if the token is valid, False otherwise.
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        print("Token is valid")
+
         return True
-    except jwt.JWTError:
+
+    except jwt.exceptions.InvalidSignatureError:
+        print("Token is invalid signature")
+
+        return False
+
+    except jwt.exceptions.ExpiredSignatureError:
+        print("Token has expired")
+
         return False
