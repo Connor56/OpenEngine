@@ -11,8 +11,8 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
-import auth.auth as auth
-from models.data_types import LoginData, Token
+import app.auth.auth as auth
+from app.models.data_types import LoginData, Token
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
