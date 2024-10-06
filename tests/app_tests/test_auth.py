@@ -4,6 +4,7 @@ import app.auth.auth as auth
 from argon2 import PasswordHasher
 import asyncpg
 import jwt
+from datetime import timedelta, datetime
 
 
 @pytest.mark.asyncio
@@ -153,7 +154,9 @@ def test_create_access_token():
     token = auth.create_access_token(data)
 
     # Decode the token
-    decoded_token = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
+    decoded_token = jwt.decode(
+        token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM]
+    )
 
     # Check if the token is valid
     assert decoded_token["username"] == data["username"]
@@ -167,10 +170,23 @@ def test_check_access_token():
     """
 
     # Create a dictionary to use as the data
-    data = {"username": "admin", "password": "password"}
+    data = {"username": "admin"}
 
     # Create the token
     token = auth.create_access_token(data)
 
     # Check if the token is valid
     assert auth.check_access_token(token)
+
+    # Check the token fails if its invalid
+    assert not auth.check_access_token(token + "1234")
+
+    # Create a new token with different data
+    data = {"username": "admin2"}
+    token = auth.create_access_token(
+        data,
+        expires_delta=timedelta(minutes=-5),
+    )
+
+    # Check if the token is valid
+    assert not auth.check_access_token(token)
