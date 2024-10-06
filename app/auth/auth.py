@@ -8,7 +8,7 @@ Created:
 
 import jwt
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 import os
 import asyncpg
@@ -126,7 +126,6 @@ async def check_credentials(
         return False
 
 
-# Generate JWT token
 def create_access_token(
     data: dict,
     expires_delta: Optional[timedelta] = None,
@@ -145,7 +144,7 @@ def create_access_token(
     Returns
     -------
     str
-        The JWT token.
+        The JWT as a string.
     """
     # Data to encode in the token
     to_encode = data.copy()
