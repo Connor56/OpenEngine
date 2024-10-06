@@ -11,6 +11,8 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
+import auth.auth as auth
+from models.data_types import LoginData, Token
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
@@ -25,8 +27,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 postgres_client = None
 qdrant_client = None
 
-@app.post("/login")
-async def admin_login():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -73,13 +73,33 @@ async def get_qdrant_client():
     return qdrant_client
 
 
+@app.post("/login", response_model=Token)
+async def admin_login(
+    login_data: LoginData,
+    postgres=Depends(get_postgres_client),
+):
     """
     Logs in an admin user by checking their credentials.
     """
+    # Check if the credentials are correct
+    creds_ok = await auth.check_credentials(
+        login_data.username,
+        login_data.password,
+        postgres_client,
+    )
+
+    if not creds_ok:
+        # Raise an HTTP 401 Unauthorized error
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     # Create an access token if user is authenticated
-    access_token = create_access_token(data={})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = auth.create_access_token(data={})
+
+    return {"token": access_token, "type": "bearer"}
 
 
 # Dependency to extract and validate the JWT
