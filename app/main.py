@@ -9,9 +9,7 @@ Created:
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from datetime import datetime, timedelta
 from typing import Optional
-from auth.auth import create_access_token
 
 app = FastAPI()
 
