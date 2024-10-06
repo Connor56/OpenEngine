@@ -3,6 +3,7 @@ import pytest
 import app.auth.auth as auth
 from argon2 import PasswordHasher
 import asyncpg
+import jwt
 
 
 @pytest.mark.asyncio
@@ -57,6 +58,58 @@ async def test_set_credentials(
 
 
 @pytest.mark.asyncio
+async def test_set_credentials_with_jwt(
+    empty_postgres_client,
+    mocker,
+):
+    """
+    Check if the set_credentials function correctly sets the
+    credentials of an admin user when a JWT is provided, despite a
+    single admin already existing.
+    """
+
+    # Username and password to use
+    password = "password"
+    username = "admin"
+
+    # Check the credentials are in postgres
+    query = "SELECT * FROM admins"
+    result = await empty_postgres_client.fetch(query)
+
+    # Set the credentials and assert they are set correctly
+    assert await auth.set_credentials(username, password, empty_postgres_client)
+
+    # Check the credentials are in postgres
+    query = "SELECT * FROM admins"
+    result = await empty_postgres_client.fetch(query)
+
+    assert len(result) == 1
+    assert result[0]["username"] == username
+
+    # Create a new password and username
+    password = "password2"
+    username = "admin2"
+
+    # Mock the check_access_token function
+    mocker.patch("app.auth.auth.check_access_token", return_value=True)
+
+    # Set the credentials with a fake JWT
+    assert await auth.set_credentials(
+        username,
+        password,
+        empty_postgres_client,
+        jwt="test_jwt",
+    )
+
+    # Check the credentials are in postgres
+    query = "SELECT * FROM admins"
+    result = await empty_postgres_client.fetch(query)
+
+    assert len(result) == 2
+    assert result[1]["username"] == username
+
+
+@pytest.mark.asyncio
 async def test_check_credentials(
     empty_postgres_client: asyncpg.Connection,
 ):
@@ -85,3 +138,5 @@ async def test_check_credentials(
         "wrong_password",
         empty_postgres_client,
     )
+
+
