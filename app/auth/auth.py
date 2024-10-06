@@ -150,11 +150,14 @@ def create_access_token(
     # Data to encode in the token
     to_encode = data.copy()
 
+    # Get the current time in UTC
+    utc_time = datetime.now(timezone.utc)
+
     # Set the expiration date for the token
     if expires_delta:
-        expire = datetime.now() + expires_delta
+        expire = utc_time + expires_delta
     else:
-        expire = datetime.now() + timedelta(minutes=15)
+        expire = utc_time + timedelta(minutes=30)
 
     # Add to the encode dictionary
     to_encode |= {"exp": expire}
