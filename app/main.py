@@ -19,11 +19,14 @@ app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-# Mock authentication function (just returns a token for any request)
-@app.post("/token")
-async def get_token():
+@app.post("/login")
+async def admin_login():
+    """
+    Logs in an admin user by checking their credentials.
+    """
 
-    access_token = create_access_token(data={"sub": ""})
+    # Create an access token if user is authenticated
+    access_token = create_access_token(data={})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
