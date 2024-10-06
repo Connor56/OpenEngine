@@ -140,3 +140,37 @@ async def test_check_credentials(
     )
 
 
+def test_create_access_token():
+    """
+    Check if the create_access_token function correctly creates a
+    JWT token with the correct data.
+    """
+
+    # Create a dictionary to use as the data
+    data = {"username": "admin", "password": "password"}
+
+    # Create the token
+    token = auth.create_access_token(data)
+
+    # Decode the token
+    decoded_token = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
+
+    # Check if the token is valid
+    assert decoded_token["username"] == data["username"]
+    assert decoded_token["password"] == data["password"]
+
+
+def test_check_access_token():
+    """
+    Check if the check_access_token function correctly checks if a
+    token is valid.
+    """
+
+    # Create a dictionary to use as the data
+    data = {"username": "admin", "password": "password"}
+
+    # Create the token
+    token = auth.create_access_token(data)
+
+    # Check if the token is valid
+    assert auth.check_access_token(token)
