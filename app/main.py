@@ -55,6 +55,24 @@ async def lifespan(app: FastAPI):
 
 # Set up the FastAPI app with lifespan
 app = FastAPI(lifespan=lifespan)
+
+
+async def get_postgres_client():
+    """
+    Gets the postgres client after the lifespan has set it up. Makes it
+    much simpler to mock the client in tests.
+    """
+    return postgres_client
+
+
+async def get_qdrant_client():
+    """
+    Gets the qdrant client after the lifespan has set it up. Makes it
+    much simpler to mock the client in tests.
+    """
+    return qdrant_client
+
+
     """
     Logs in an admin user by checking their credentials.
     """
