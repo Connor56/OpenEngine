@@ -76,11 +76,12 @@ async def get_qdrant_client():
 @app.post("/login", response_model=Token)
 async def admin_login(
     login_data: LoginData,
-    postgres=Depends(get_postgres_client),
+    postgres_client=Depends(get_postgres_client),
 ):
     """
     Logs in an admin user by checking their credentials.
     """
+
     # Check if the credentials are correct
     creds_ok = await auth.check_credentials(
         login_data.username,
