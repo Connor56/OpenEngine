@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
 import app.auth.auth as auth
-from app.models.data_types import LoginData, Token
+from app.models.data_types import LoginData, Token, CrawlToken
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
@@ -73,6 +73,13 @@ async def get_qdrant_client():
     return qdrant_client
 
 
+async def check_token(token: str = Depends(oauth2_scheme)):
+    """
+    Checks that the token is valid and returns the user's username.
+    """
+    return auth.check_access_token(token)
+
+
 @app.post("/login", response_model=Token)
 async def admin_login(
     login_data: LoginData,
@@ -102,6 +109,8 @@ async def admin_login(
     access_token = auth.create_access_token(data={})
 
     return {"token": access_token, "type": "bearer"}
+
+
 @app.post("/set-admin")
 async def set_admin(
     request: Request,
@@ -142,3 +151,118 @@ async def set_admin(
         )
 
 
+@app.get("/get-admin")
+async def get_admin(token: str = Depends(oauth2_scheme)):
+    """
+    Get the admin frontend for the user to work with and make admin
+    changes to the backend of the site.
+    """
+    pass
+
+
+@app.post("/add-url")
+async def add_url(
+    url: UrlData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Add a new url to the seed urls table in the database.
+    """
+    pass
+
+
+@app.post("/delete-url")
+async def delete_url(
+    url: UrlData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Delete a url from the seed urls table in the database.
+    """
+    pass
+
+
+@app.post("/update-url")
+async def update_url(
+    url: UrlUpdateData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Update an url in the seed urls table in the database.
+    """
+    pass
+
+
+@app.post("/start-crawl", response_model=CrawlToken)
+async def start_crawl(
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+    qdrant_client=Depends(get_qdrant_client),
+):
+    """
+    Start the url crawling process.
+    """
+    pass
+
+
+@app.post("/stop-crawl")
+async def stop_crawl(
+    crawl_token: CrawlToken,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Uses a crawl token to find the crawling process and stop it.
+    """
+    pass
+
+
+@app.post("/pause-crawl")
+async def pause_crawl(
+    crawl_token: CrawlToken,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Uses a crawl token to find the crawling process and pause it.
+    """
+    pass
+
+
+@app.get("/get-seed-urls", response_model=list[Url])
+async def get_seed_urls(
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Get the seed urls from the database.
+    """
+    pass
+
+
+@app.get("/get-searchable-urls", response_model=list[Url])
+async def get_searchable_urls(
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Get all the searchable urls from the database. These are the urls
+    that have been cralwed and processed.
+    """
+    pass
+
+
+@app.get("/get-potential-urls", response_model=list[Url])
+async def get_potential_urls(
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Get all the potential urls from the database. These are the urls
+    that have been seen during crawls but discarded because they
+    didn't pass the filter algorithms.
+    """
+    pass
