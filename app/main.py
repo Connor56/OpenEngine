@@ -7,7 +7,7 @@ Created:
 """
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
@@ -101,3 +101,43 @@ async def admin_login(
     access_token = auth.create_access_token(data={})
 
     return {"token": access_token, "type": "bearer"}
+@app.post("/set-admin")
+async def set_admin(
+    request: Request,
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Sets the credentials of an admin user if they have a valid JWT or
+    if no admin user has been set yet.
+    """
+    # Get the authorisation header
+    auth_header = request.headers.get("Authorization")
+
+    # Get the token if it exists
+    token = None
+
+    if auth_header is not None:
+        token = auth_header.split(" ")[1]
+
+    # Get the admin data
+    json = await request.json()
+    admin_data = LoginData(**json)
+
+    # Attempt to set the admin data
+    was_set = await auth.set_credentials(
+        admin_data.username,
+        admin_data.password,
+        postgres_client,
+        token=token,
+    )
+
+    if was_set:
+        return {"message": "Admin set successfully"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Couldn't set admin",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
