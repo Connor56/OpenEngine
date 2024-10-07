@@ -9,3 +9,7 @@ class LoginData(BaseModel):
 class Token(BaseModel):
     token: str
     type: str
+
+
+class CrawlToken(BaseModel):
+    token: str
