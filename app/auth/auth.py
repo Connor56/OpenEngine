@@ -27,7 +27,7 @@ async def set_credentials(
     username: str,
     password: str,
     postgres_client: asyncpg.Connection,
-    jwt: Optional[str] = None,
+    token: Optional[str] = None,
 ) -> bool:
     """
     Sets credentials for an admin user in the admins table.
@@ -43,7 +43,7 @@ async def set_credentials(
     postgres_client : asyncpg.Connection
         The PostgreSQL client.
 
-    jwt : Optional[str], optional
+    token : Optional[str], optional
         A token to authenticate the requester is the admin user. If
         this is not provided, the function will only set admin
         credentials if the admins table is empty.
@@ -53,7 +53,7 @@ async def set_credentials(
     bool
         True if the credentials were set correctly, False otherwise.
     """
-    if jwt is None:
+    if token is None:
         # Check if the admins table is empty
         query = "SELECT count(*) FROM admins;"
         result = await postgres_client.fetchrow(query)
@@ -64,7 +64,7 @@ async def set_credentials(
 
     else:
         # Check if the JWT is valid
-        if not check_access_token(jwt):
+        if not check_access_token(token):
             print("JWT is invalid")
             return False
 

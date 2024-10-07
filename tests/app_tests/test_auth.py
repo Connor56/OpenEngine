@@ -99,7 +99,7 @@ async def test_set_credentials_with_jwt(
         username,
         password,
         empty_postgres_client,
-        jwt="test_jwt",
+        token="test_jwt",
     )
 
     # Check the credentials are in postgres
@@ -154,9 +154,7 @@ def test_create_access_token():
     token = auth.create_access_token(data)
 
     # Decode the token
-    decoded_token = jwt.decode(
-        token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM]
-    )
+    decoded_token = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
 
     # Check if the token is valid
     assert decoded_token["username"] == data["username"]
