@@ -79,7 +79,8 @@ async def admin_login(
     postgres_client=Depends(get_postgres_client),
 ):
     """
-    Logs in an admin user by checking their credentials.
+    Logs in an admin user by checking their credentials and returning
+    a JWT if the user is allowed access to the admin panel.
     """
 
     # Check if the credentials are correct
