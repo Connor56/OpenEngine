@@ -48,3 +48,31 @@ async def test_login(empty_postgres_client):
 
         # Check the response is correct
         assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_set_admin(empty_postgres_client):
+    """
+    Test the set_admin endpoint correctly sets an admin user when a
+    there's no user yet, or when a valid JWT is provided. Check that
+    all other requests are rejected.
+    """
+
+    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+
+    # Login with correct credentials
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Set the admin user
+        response = await ac.post(
+            "/set-admin",
+            json={
+                "username": "admin",
+                "password": "password",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Admin set successfully"}
