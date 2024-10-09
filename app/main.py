@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
 import os
+from fastapi.responses import HTMLResponse
 
 load_dotenv(dotenv_path="../.env")
 
@@ -151,13 +152,30 @@ async def set_admin(
         )
 
 
+def get_admin_page():
+    """
+    Loads and returns the static admin page as html text.
+    """
+    return "placeholder"
+
+
 @app.get("/get-admin")
-async def get_admin(token: str = Depends(oauth2_scheme)):
+async def get_admin(
+    token: str = Depends(oauth2_scheme),
+    page: str = Depends(get_admin_page),
+):
     """
     Get the admin frontend for the user to work with and make admin
     changes to the backend of the site.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return HTMLResponse(content=page)
 
 
 @app.post("/add-seed-url")
