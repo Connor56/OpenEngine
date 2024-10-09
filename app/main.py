@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
 import app.auth.auth as auth
-from app.models.data_types import LoginData, Token, CrawlToken
+from app.models.data_types import LoginData, Token, CrawlToken, UrlData, UrlUpdateData
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
@@ -160,8 +160,8 @@ async def get_admin(token: str = Depends(oauth2_scheme)):
     pass
 
 
-@app.post("/add-url")
-async def add_url(
+@app.post("/add-seed-url")
+async def add_seed_url(
     url: UrlData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -172,8 +172,8 @@ async def add_url(
     pass
 
 
-@app.post("/delete-url")
-async def delete_url(
+@app.post("/delete-seed-url")
+async def delete_seed_url(
     url: UrlData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -184,8 +184,8 @@ async def delete_url(
     pass
 
 
-@app.post("/update-url")
-async def update_url(
+@app.post("/update-seed-url")
+async def update_seed_url(
     url: UrlUpdateData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -232,7 +232,7 @@ async def pause_crawl(
     pass
 
 
-@app.get("/get-seed-urls", response_model=list[Url])
+@app.get("/get-seed-urls", response_model=list[UrlData])
 async def get_seed_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -243,19 +243,19 @@ async def get_seed_urls(
     pass
 
 
-@app.get("/get-searchable-urls", response_model=list[Url])
+@app.get("/get-searchable-urls", response_model=list[UrlData])
 async def get_searchable_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
     """
     Get all the searchable urls from the database. These are the urls
-    that have been cralwed and processed.
+    that have been crawled and processed.
     """
     pass
 
 
-@app.get("/get-potential-urls", response_model=list[Url])
+@app.get("/get-potential-urls", response_model=list[UrlData])
 async def get_potential_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
