@@ -1,7 +1,8 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
-from app.main import app, get_postgres_client
+from app.main import app, get_postgres_client, get_admin_page
 from app.auth.auth import set_credentials
+from fastapi.responses import JSONResponse
 
 
 @pytest.mark.asyncio
@@ -76,3 +77,31 @@ async def test_set_admin(empty_postgres_client):
 
         assert response.status_code == 200
         assert response.json() == {"message": "Admin set successfully"}
+
+
+@pytest.mark.asyncio
+async def test_get_admin(valid_token):
+    """
+    Checks the get_admin endpoint returns the admin page if the user
+    has an authenticated token.
+    """
+
+    app.dependency_overrides[get_admin_page] = (
+        lambda: "<html><body>Admin Page</body></html>"
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        response = await ac.get(
+            "/get-admin",
+            headers={"Authorization": f"Bearer {valid_token}"},
+        )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
+
+    print(response.text)
+
+    assert "<html><body>Admin Page</body></html>" in response.text
