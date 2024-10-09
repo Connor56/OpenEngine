@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import http.server
 import socketserver
 import threading
@@ -9,6 +9,8 @@ import asyncpg
 from typing import Tuple
 import requests
 import os
+from app.auth.auth import SECRET_KEY, ALGORITHM
+import jwt
 
 
 # Fixture to start and stop the local HTTP server
@@ -253,9 +255,7 @@ def embedding_model():
     """
     import sentence_transformers
 
-    return sentence_transformers.SentenceTransformer(
-        "multi-qa-MiniLM-L6-cos-v1"
-    )
+    return sentence_transformers.SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
 
 
 @pytest.fixture(scope="function")
@@ -271,3 +271,12 @@ def soup():
 
     soup = load(f"{file_path}/test_data/html_page.joblib")
     return soup
+
+
+@pytest.fixture(scope="function")
+def valid_token():
+    """
+    Returns a valid json web token for testing access.
+    """
+    data = {"exp": datetime.now(timezone.utc) + timedelta(minutes=300)}
+    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
