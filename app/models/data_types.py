@@ -13,3 +13,11 @@ class Token(BaseModel):
 
 class CrawlToken(BaseModel):
     token: str
+
+
+class UrlData(BaseModel):
+    url: str
+
+
+class UrlUpdateData(BaseModel):
+    url: str
