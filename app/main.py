@@ -237,7 +237,17 @@ async def update_seed_url(
     """
     Update an url in the seed urls table in the database.
     """
-    pass
+    # Check if the credentials are correct
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Update the url in the database
+    await storage.update_seed_url(url.old_url, url.url, postgres_client)
+    return {"message": "Seed url updated successfully"}
 
 
 @app.post("/start-crawl", response_model=CrawlToken)
