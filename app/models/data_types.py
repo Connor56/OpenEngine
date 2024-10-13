@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class LoginData(BaseModel):
@@ -18,6 +19,13 @@ class CrawlToken(BaseModel):
 class SeedUrl(BaseModel):
     url: str
 
+
+class CrawledUrl(BaseModel):
+    url: str
+    firstVisited: datetime
+    lastVisited: datetime
+    allVisits: int
+    externalLinks: list[str]
 
 class UrlUpdateData(BaseModel):
     url: str
