@@ -348,3 +348,55 @@ async def test_get_seed_urls(valid_token, empty_postgres_client):
         assert response.json() == url_json
 
 
+@pytest.mark.asyncio
+async def test_get_crawled_urls(
+    valid_token,
+    populated_postgres_client,
+):
+    """
+    Check that the get-searchable-urls endpoint correctly returns the
+    list of all urls that have been crawled.
+    """
+
+    # Override the dependency to use the populated postgres client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: populated_postgres_client
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Get the searchable urls
+        response = await ac.get(
+            "/get-crawled-urls",
+            headers={"Authorization": f"Bearer {valid_token}"},
+        )
+
+        # Check the reponse is okay
+        assert response.status_code == 200
+
+        # Check the response has the correct information
+        crawled_urls = response.json()
+
+        # Check the response has the correct information
+        assert len(crawled_urls) == 1
+        assert crawled_urls[0]["url"] == "https://caseyhandmer.wordpress.com/"
+        assert crawled_urls[0]["firstVisited"] is not None
+        assert (
+            datetime.strptime(
+                crawled_urls[0]["firstVisited"], "%Y-%m-%dT%H:%M:%S.%f"
+            )
+            < datetime.now()
+        )
+        assert crawled_urls[0]["lastVisited"] is not None
+        assert (
+            datetime.strptime(
+                crawled_urls[0]["lastVisited"], "%Y-%m-%dT%H:%M:%S.%f"
+            )
+            < datetime.now()
+        )
+        assert crawled_urls[0]["allVisits"] == 1
+        assert crawled_urls[0]["externalLinks"] == []
+
+
