@@ -36,3 +36,4 @@ class PotentialUrl(BaseModel):
 
 class UrlUpdateData(BaseModel):
     url: str
+    old_url: str
