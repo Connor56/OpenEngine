@@ -210,3 +210,92 @@ async def test_delete_seed_url(valid_token, empty_postgres_client):
         assert len(results) == 0
 
 
+@pytest.mark.asyncio
+async def test_update_seed_url(valid_token, empty_postgres_client):
+    """
+    Check that the update_seed_url endpoint correctly updates a seed
+    url in the database when a valid token is provided.
+    """
+
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Add a seed url to the database
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": "https://example.com"},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        # Update the seed url
+        response = await ac.post(
+            "/update-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={
+                "url": "https://snowchild.com",
+                "old_url": "https://example.com",
+            },
+        )
+
+        # Check the url was updated in the database
+        results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+        assert len(results) == 1
+        assert results[0][0] == 1
+        assert results[0][1] == "https://snowchild.com"
+
+
+@pytest.mark.asyncio
+async def test_update_seed_url_invalid_token(
+    valid_token,
+    empty_postgres_client,
+):
+    """
+    Check that the update_seed_url endpoint refused to update a seed
+    url in a database with an invalid token.
+    """
+
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Add a seed url to the database
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": "https://example.com"},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        # Update the seed url
+        response = await ac.post(
+            "/update-seed-url",
+            headers={"Authorization": f"Bearer jaslkdfjalksdjf"},
+            json={
+                "url": "https://snowchild.com",
+                "old_url": "https://example.com",
+            },
+        )
+
+        # Check the url was updated in the database
+        results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+        assert len(results) == 1
+        assert results[0][0] == 1
+        assert results[0][1] == "https://example.com"
+
+
