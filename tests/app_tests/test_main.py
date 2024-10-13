@@ -15,7 +15,9 @@ async def test_login(empty_postgres_client):
     # Add an admin user to the postgres database
     assert await set_credentials("admin", "password", empty_postgres_client)
 
-    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
 
     # Login with correct credentials
     async with AsyncClient(
@@ -59,7 +61,9 @@ async def test_set_admin(empty_postgres_client):
     all other requests are rejected.
     """
 
-    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
 
     # Login with correct credentials
     async with AsyncClient(
@@ -114,7 +118,9 @@ async def test_add_seed_url(valid_token, empty_postgres_client):
     database with a valid token.
     """
 
-    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -144,7 +150,9 @@ async def test_add_seed_url_without_valid_token(empty_postgres_client):
     an invalid token.
     """
 
-    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -172,7 +180,9 @@ async def test_delete_seed_url(valid_token, empty_postgres_client):
     from the database with a valid token.
     """
 
-    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -198,3 +208,5 @@ async def test_delete_seed_url(valid_token, empty_postgres_client):
         results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
 
         assert len(results) == 0
+
+
