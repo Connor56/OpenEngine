@@ -74,7 +74,7 @@ def get_base_site(
     url: str,
 ) -> str:
     """
-    Extracts the base site location from an U
+    Extracts the base site location from an Url.
 
     Parameters
     ----------
