@@ -243,6 +243,48 @@ async def test_get_seed_urls(empty_postgres_client):
 
 
 @pytest.mark.asyncio
+async def test_get_crawled_urls(empty_postgres_client):
+    """
+    Check that the get_searchable_urls function correctly returns a
+    list of seed urls from the database.
+    """
+
+    # List of urls to add to the database
+    urls_to_add = [
+        "https://example.com",
+        "https://snowchild.com",
+        "https://casey.com",
+    ]
+
+    the_time = datetime.now()
+
+    # Add the seed urls to the database
+    for url in urls_to_add:
+        # Create a resource
+        resource = st.Resource(
+            url=url,
+            firstVisited=the_time,
+            lastVisited=the_time,
+            allVisits=1,
+            externalLinks=[],
+        )
+        assert await st.log_resource(resource, empty_postgres_client)
+
+    # Get the searchable urls
+    results: list[CrawledUrl] = await st.get_crawled_urls(empty_postgres_client)
+
+    # Check the urls are correct
+    assert len(results) == len(urls_to_add)
+
+    for idx, result in enumerate(results):
+        assert result.url in urls_to_add[idx]
+        assert result.firstVisited is not None
+        assert result.lastVisited is not None
+        assert result.allVisits == 1
+        assert result.externalLinks == []
+
+
+@pytest.mark.asyncio
 async def test_add_potential_url(empty_postgres_client):
     """
     Checks that the add_potential_urls function correctly adds a
