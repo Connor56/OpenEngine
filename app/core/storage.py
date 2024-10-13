@@ -16,6 +16,7 @@ import asyncpg
 from uuid import uuid4
 from urllib.parse import urlparse
 from app.models.data_types import CrawledUrl, PotentialUrl
+from app.core.utility import check_url
 
 
 @dataclass
@@ -398,3 +399,36 @@ async def get_crawled_urls(
 
     return urls
 
+
+async def get_potential_urls(
+    postgres_client: asyncpg.Connection,
+) -> list[PotentialUrl]:
+    """
+    Gets a list of all the potential urls from the database.
+
+    Parameters
+    ----------
+    postgres_client : asyncpg.Connection
+        The PostgreSQL client to access the database with the urls
+        in.
+
+    Returns
+    -------
+    list[PotentialUrl]
+        A list of potential urls.
+    """
+
+    # Get the potential urls from the database
+    results = await postgres_client.fetch("SELECT * FROM potential_urls")
+
+    # Convert the results to a list of urls
+    urls = [
+        PotentialUrl(
+            url=result[1],
+            firstSeen=result[2],
+            timesSeen=result[3],
+        )
+        for result in results
+    ]
+
+    return urls
