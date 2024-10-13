@@ -319,4 +319,31 @@ async def test_add_potential_url(empty_postgres_client):
     assert results[0][2] == time_seen
     assert results[0][3] == 2
 
+
 @pytest.mark.asyncio
+async def test_get_potential_urls(empty_postgres_client):
+    """
+    Check that the get_potential_urls function correctly returns a
+    list of potential urls from the database.
+    """
+
+    # List of urls to add to the database
+    urls_to_add = [
+        "https://example.com",
+        "https://snowchild.com",
+        "https://casey.com",
+    ]
+
+    # Add the urls to the database
+    for url in urls_to_add:
+        st.add_potential_url(url, datetime.now(), empty_postgres_client)
+
+    # Get the potential urls
+    results: list[PotentialUrl] = await st.get_potential_urls(
+        empty_postgres_client
+    )
+
+    for idx, result in enumerate(results):
+        assert result.url in urls_to_add[idx]
+        assert result.firstSeen is not None
+        assert result.timesSeen == 1
