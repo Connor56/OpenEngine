@@ -363,3 +363,38 @@ async def get_seed_urls(
 
     return urls
 
+
+async def get_crawled_urls(
+    postgres_client: asyncpg.Connection,
+) -> list[CrawledUrl]:
+    """
+    Gets a list of all the crawled urls from the database.
+
+    Parameters
+    ----------
+    postgres_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    list[CrawledUrl]
+        A list of crawled urls.
+    """
+
+    # Get the crawled urls from the database
+    results = await postgres_client.fetch("SELECT * FROM resources")
+
+    # Convert the results to a list of urls
+    urls = [
+        CrawledUrl(
+            url=result[1],
+            firstVisited=result[2],
+            lastVisited=result[3],
+            allVisits=result[4],
+            externalLinks=result[5],
+        )
+        for result in results
+    ]
+
+    return urls
+
