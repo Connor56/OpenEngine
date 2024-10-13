@@ -194,3 +194,8 @@ def check_access_token(token: str) -> bool:
         print("Token has expired")
 
         return False
+
+    except jwt.exceptions.DecodeError:
+        print("Token is invalid")
+
+        return False
