@@ -299,3 +299,52 @@ async def test_update_seed_url_invalid_token(
         assert results[0][1] == "https://example.com"
 
 
+@pytest.mark.asyncio
+async def test_get_seed_urls(valid_token, empty_postgres_client):
+    """
+    Check that the get_seed_urls endpoint correctly returns a list of
+    seed urls from the database.
+    """
+
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # List of urls to add to the database
+        urls_to_add = [
+            "https://example.com",
+            "https://snowchild.com",
+            "https://casey.com",
+        ]
+
+        # Add the seed urls to the database
+        for url in urls_to_add:
+            response = await ac.post(
+                "/add-seed-url",
+                headers={"Authorization": f"Bearer {valid_token}"},
+                json={"url": url},
+            )
+
+            assert response.status_code == 200
+            assert response.json() == {"message": "Seed url added successfully"}
+
+        # Get the seed urls
+        response = await ac.get(
+            "/get-seed-urls",
+            headers={"Authorization": f"Bearer {valid_token}"},
+        )
+
+        # Check the reponse is okay
+        assert response.status_code == 200
+
+        # Turn the urls into the expected JSON format
+        url_json = [{"url": url} for url in urls_to_add]
+
+        # Check the response has the correct information
+        assert response.json() == url_json
+
+
