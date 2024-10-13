@@ -15,7 +15,7 @@ class CrawlToken(BaseModel):
     token: str
 
 
-class UrlData(BaseModel):
+class SeedUrl(BaseModel):
     url: str
 
 

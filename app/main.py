@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
 import app.auth.auth as auth
-from app.models.data_types import LoginData, Token, CrawlToken, UrlData, UrlUpdateData
+from app.models.data_types import LoginData, Token, CrawlToken, SeedUrl, UrlUpdateData
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
@@ -180,7 +180,7 @@ async def get_admin(
 
 @app.post("/add-seed-url")
 async def add_seed_url(
-    url: UrlData,
+    url: SeedUrl,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
@@ -192,7 +192,7 @@ async def add_seed_url(
 
 @app.post("/delete-seed-url")
 async def delete_seed_url(
-    url: UrlData,
+    url: SeedUrl,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
@@ -250,7 +250,7 @@ async def pause_crawl(
     pass
 
 
-@app.get("/get-seed-urls", response_model=list[UrlData])
+@app.get("/get-seed-urls", response_model=list[SeedUrl])
 async def get_seed_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -261,7 +261,7 @@ async def get_seed_urls(
     pass
 
 
-@app.get("/get-searchable-urls", response_model=list[UrlData])
+@app.get("/get-searchable-urls", response_model=list[SeedUrl])
 async def get_searchable_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -273,7 +273,7 @@ async def get_searchable_urls(
     pass
 
 
-@app.get("/get-potential-urls", response_model=list[UrlData])
+@app.get("/get-potential-urls", response_model=list[SeedUrl])
 async def get_potential_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
