@@ -12,7 +12,15 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
 import app.auth.auth as auth
-from app.models.data_types import LoginData, Token, CrawlToken, SeedUrl, UrlUpdateData
+from app.models.data_types import (
+    LoginData,
+    Token,
+    CrawlToken,
+    SeedUrl,
+    UrlUpdateData,
+    CrawledUrl,
+    PotentialUrl,
+)
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
