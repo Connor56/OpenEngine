@@ -186,14 +186,12 @@ async def populated_postgres_client(base_postgres_details: str):
 
         # Insert a resource
         await client.execute(
-            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES (%s, %s, %s, %s, %s)",
-            (
-                "https://caseyhandmer.wordpress.com/",
-                datetime.now(),
-                datetime.now(),
-                1,
-                [],
-            ),
+            "INSERT INTO resources (url, firstVisited, lastVisited, allVisits, externalLinks) VALUES ($1, $2, $3, $4, $5)",
+            "https://caseyhandmer.wordpress.com/",
+            datetime.now(),
+            datetime.now(),
+            1,
+            [],
         )
 
         yield client
