@@ -323,7 +323,8 @@ async def get_crawled_urls(
 
     return await storage.get_crawled_urls(postgres_client)
 
-@app.get("/get-potential-urls", response_model=list[SeedUrl])
+
+@app.get("/get-potential-urls", response_model=list[PotentialUrl])
 async def get_potential_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
@@ -333,4 +334,11 @@ async def get_potential_urls(
     that have been seen during crawls but discarded because they
     didn't pass the filter algorithms.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return await storage.get_potential_urls(postgres_client)
