@@ -179,7 +179,9 @@ def test_check_access_token():
     # Check the token fails if its invalid
     assert not auth.check_access_token(token + "1234")
 
-    # Create a new token with different data
+    assert not auth.check_access_token("something")
+
+    # Create a new token that's expired
     data = {"username": "admin2"}
     token = auth.create_access_token(
         data,
