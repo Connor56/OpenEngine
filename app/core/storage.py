@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import asyncpg
 from uuid import uuid4
+from urllib.parse import urlparse
 
 
 @dataclass
@@ -136,5 +137,90 @@ async def log_resource(
         return True
     except Exception as e:
         print("Failed to load resource with error:", e)
+
+        return False
+
+
+async def add_seed_url(
+    url: str,
+    db_client: asyncpg.Connection,
+) -> bool:
+    """
+    Adds a new seed url to the database.
+
+    Parameters
+    ----------
+    url : str
+        The url to add.
+
+    db_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    bool
+        True if the url was added successfully, False otherwise.
+    """
+    # Check the url is valid
+    parsed = urlparse(url)
+
+    if not bool(parsed.scheme) and bool(parsed.netloc):
+        print("Invalid url:", url)
+
+        return False
+
+    # Create a tuple of the resource's attributes
+    attributes = (url,)
+
+    # Log the resource to the database
+    try:
+
+        await db_client.execute(
+            "INSERT INTO seed_urls (url) VALUES ($1)",
+            *attributes,
+        )
+
+        return True
+    except Exception as e:
+        print("Failed to add url with error:", e)
+
+        return False
+
+
+async def delete_seed_url(
+    url: str,
+    db_client: asyncpg.Connection,
+) -> bool:
+    """
+    Deletes a seed url from the database.
+
+    Parameters
+    ----------
+    url : str
+        The url to delete.
+
+    db_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    bool
+        True if the url was deleted successfully, False otherwise.
+    """
+    # Create a tuple of the resource's attributes
+    attributes = (url,)
+
+    # Log the resource to the database
+    try:
+
+        await db_client.execute(
+            "DELETE FROM seed_urls WHERE url = $1",
+            *attributes,
+        )
+
+        return True
+
+    except Exception as e:
+        print("Failed to delete url with error:", e)
 
         return False
