@@ -338,3 +338,28 @@ async def update_seed_url(
 
         return False
 
+
+async def get_seed_urls(
+    postgres_client: asyncpg.Connection,
+) -> list[str]:
+    """
+    Gets a list of seed urls from the database.
+
+    Parameters
+    ----------
+    postgres_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    list[str]
+        A list of seed urls.
+    """
+    # Get the seed urls from the database
+    results = await postgres_client.fetch("SELECT * FROM seed_urls")
+
+    # Convert the results to a list of urls
+    urls = [{"url": result[1]} for result in results]
+
+    return urls
+
