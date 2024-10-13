@@ -187,6 +187,32 @@ async def test_delete_seed_url(empty_postgres_client):
 
 
 @pytest.mark.asyncio
+async def test_update_seed_url(empty_postgres_client):
+    """
+    Check that the update_seed_url function correctly updates a seed
+    url in the database.
+    """
+
+    url = "https://example.com"
+
+    # Add the url to the database
+    assert await st.add_seed_url(url, empty_postgres_client)
+
+    # Update the url in the database
+    await st.update_seed_url(
+        url, "https://snowchild.com", empty_postgres_client
+    )
+
+    # Get the resource from the database
+    results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+    # Was it added correctly?
+    assert len(results) == 1
+    assert results[0][0] == 1
+    assert results[0][1] == "https://snowchild.com"
+
+
+@pytest.mark.asyncio
 async def test_add_potential_url(empty_postgres_client):
     """
     Checks that the add_potential_urls function correctly adds a
