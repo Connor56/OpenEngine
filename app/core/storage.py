@@ -76,7 +76,11 @@ async def store_embedding(
         points.append(
             PointStruct(
                 id=uuid4().hex,
-                vector=vector.tolist() if isinstance(vector, np.ndarray) else vector,
+                vector=(
+                    vector.tolist()
+                    if isinstance(vector, np.ndarray)
+                    else vector
+                ),
                 payload={"text": metadata[idx]},
             )
         )
