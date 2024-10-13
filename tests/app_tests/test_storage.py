@@ -213,6 +213,36 @@ async def test_update_seed_url(empty_postgres_client):
 
 
 @pytest.mark.asyncio
+async def test_get_seed_urls(empty_postgres_client):
+    """
+    Check that the get_seed_urls function correctly returns a list of
+    seed urls from the database.
+    """
+
+    # List of urls to add to the database
+    urls_to_add = [
+        "https://example.com",
+        "https://snowchild.com",
+        "https://casey.com",
+    ]
+
+    # Add the seed urls to the database
+    for url in urls_to_add:
+        assert await st.add_seed_url(url, empty_postgres_client)
+
+    # Get the seed urls
+    results = await st.get_seed_urls(empty_postgres_client)
+
+    # Check the urls are correct
+    assert len(results) == len(urls_to_add)
+
+    # Put urls to add into the expected format
+    urls_to_add = [{"url": url} for url in urls_to_add]
+
+    assert results == urls_to_add
+
+
+@pytest.mark.asyncio
 async def test_add_potential_url(empty_postgres_client):
     """
     Checks that the add_potential_urls function correctly adds a
