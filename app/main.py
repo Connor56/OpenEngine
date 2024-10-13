@@ -303,17 +303,25 @@ async def get_seed_urls(
 
     return await storage.get_seed_urls(postgres_client)
 
-@app.get("/get-searchable-urls", response_model=list[SeedUrl])
-async def get_searchable_urls(
+
+@app.get("/get-crawled-urls", response_model=list[CrawledUrl])
+async def get_crawled_urls(
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
     """
-    Get all the searchable urls from the database. These are the urls
-    that have been crawled and processed.
+    Get all the crawled urls from the database. These are the urls
+    that have been crawled, processed, and stored in a row in
+    postgres.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
+    return await storage.get_crawled_urls(postgres_client)
 
 @app.get("/get-potential-urls", response_model=list[SeedUrl])
 async def get_potential_urls(
