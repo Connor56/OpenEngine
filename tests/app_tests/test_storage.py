@@ -91,7 +91,9 @@ async def test_store_two_embedding(vector_client):
     # This must be done because order is based on randomly assigned uuids and thus is
     # not guaranteed
     idx1 = [
-        idx for idx, point in enumerate(points) if point.payload == {"text": metadata1}
+        idx
+        for idx, point in enumerate(points)
+        if point.payload == {"text": metadata1}
     ][0]
     idx2 = 0 if idx1 == 1 else 1
 
@@ -182,6 +184,8 @@ async def test_delete_seed_url(empty_postgres_client):
 
     # Was it added correctly?
     assert len(results) == 0
+
+
 @pytest.mark.asyncio
 async def test_add_potential_url(empty_postgres_client):
     """
