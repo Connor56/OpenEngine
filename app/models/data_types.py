@@ -27,5 +27,12 @@ class CrawledUrl(BaseModel):
     allVisits: int
     externalLinks: list[str]
 
+
+class PotentialUrl(BaseModel):
+    url: str
+    firstSeen: datetime
+    timesSeen: int
+
+
 class UrlUpdateData(BaseModel):
     url: str
