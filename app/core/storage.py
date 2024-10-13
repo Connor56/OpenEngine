@@ -296,3 +296,45 @@ async def delete_seed_url(
         return False
 
 
+async def update_seed_url(
+    old_url: str,
+    new_url: str,
+    postgres_client: asyncpg.Connection,
+) -> bool:
+    """
+    Updates a seed url in the database.
+
+    Parameters
+    ----------
+    old_url : str
+        The old url to update.
+
+    new_url : str
+        The new url to update to.
+
+    postgres_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    bool
+        True if the url was updated successfully, False otherwise.
+    """
+    # Create a tuple of the resource's attributes
+    attributes = (new_url, old_url)
+
+    # Log the resource to the database
+    try:
+
+        await postgres_client.execute(
+            "UPDATE seed_urls SET url = $1 WHERE url = $2",
+            *attributes,
+        )
+
+        return True
+
+    except Exception as e:
+        print("Failed to update url with error:", e)
+
+        return False
+
