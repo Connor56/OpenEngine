@@ -3,6 +3,7 @@ from httpx import ASGITransport, AsyncClient
 from app.main import app, get_postgres_client, get_admin_page
 from app.auth.auth import set_credentials
 from fastapi.responses import JSONResponse
+from datetime import datetime
 
 
 @pytest.mark.asyncio
@@ -400,3 +401,48 @@ async def test_get_crawled_urls(
         assert crawled_urls[0]["externalLinks"] == []
 
 
+@pytest.mark.asyncio
+async def test_get_potential_urls(
+    valid_token,
+    empty_postgres_client,
+):
+    """
+    Checks the get_potential_urls endpoint correctly returns a list of
+    potential urls from the database.
+    """
+
+    dummy_potential_url = (
+        "https://snowchild.com",
+        datetime.now(),
+        1,
+    )
+
+    query = "INSERT INTO potential_urls (url, firstSeen, timesSeen) VALUES ($1, $2, $3)"
+
+    await empty_postgres_client.execute(query, *dummy_potential_url)
+
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Get the potential urls
+        response = await ac.get(
+            "/get-potential-urls",
+            headers={"Authorization": f"Bearer {valid_token}"},
+        )
+
+        # Check the reponse is okay
+        assert response.status_code == 200
+
+        # Check the response has the correct information
+        potential_urls = response.json()
+
+        # Check the response has the correct information
+        assert len(potential_urls) == 1
+        assert potential_urls[0]["url"] == "https://snowchild.com"
+        assert potential_urls[0]["firstSeen"] is not None
+        assert potential_urls[0]["timesSeen"] == 1
