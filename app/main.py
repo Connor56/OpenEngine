@@ -294,8 +294,14 @@ async def get_seed_urls(
     """
     Get the seed urls from the database.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
+    return await storage.get_seed_urls(postgres_client)
 
 @app.get("/get-searchable-urls", response_model=list[SeedUrl])
 async def get_searchable_urls(
