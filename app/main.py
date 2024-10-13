@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
 import os
+import app.core.storage as storage
 from fastapi.responses import HTMLResponse
 
 load_dotenv(dotenv_path="../.env")
@@ -187,7 +188,16 @@ async def add_seed_url(
     """
     Add a new url to the seed urls table in the database.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Add the url to the database
+    await storage.add_seed_url(url.url, postgres_client)
+    return {"message": "Seed url added successfully"}
 
 
 @app.post("/delete-seed-url")
@@ -199,7 +209,15 @@ async def delete_seed_url(
     """
     Delete a url from the seed urls table in the database.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Delete the url from the database
+    await storage.delete_seed_url(url.url, postgres_client)
 
 
 @app.post("/update-seed-url")
