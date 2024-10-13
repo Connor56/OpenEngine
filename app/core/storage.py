@@ -15,6 +15,7 @@ from datetime import datetime
 import asyncpg
 from uuid import uuid4
 from urllib.parse import urlparse
+from app.models.data_types import CrawledUrl, PotentialUrl
 
 
 @dataclass
