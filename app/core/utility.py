@@ -88,3 +88,21 @@ def get_base_site(
     """
     parsed_url = urlparse(url)
     return parsed_url.scheme + "://" + parsed_url.netloc
+
+
+def check_url(url: str) -> bool:
+    """
+    Checks if a url is valid.
+
+    Parameters
+    ----------
+    url : str
+        The url to check.
+
+    Returns
+    -------
+    bool
+        True if the url is valid, False otherwise.
+    """
+    parsed_url = urlparse(url)
+    return bool(parsed_url.scheme and parsed_url.netloc)
