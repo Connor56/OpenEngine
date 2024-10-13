@@ -100,7 +100,7 @@ async def empty_postgres_client(base_postgres_details: str):
 
         print("connected to postgres")
 
-        # Create the table
+        # Create the resource table
         resources_sql = """CREATE TABLE resources ( 
             id SERIAL PRIMARY KEY,
             url VARCHAR(2048) NOT NULL,
@@ -112,7 +112,7 @@ async def empty_postgres_client(base_postgres_details: str):
 
         await client.execute(resources_sql)
 
-        # Create the table
+        # Create the admin table
         admins_sql = """CREATE TABLE admins ( 
             id SERIAL PRIMARY KEY,
             username VARCHAR(2048) NOT NULL,
@@ -121,12 +121,21 @@ async def empty_postgres_client(base_postgres_details: str):
 
         await client.execute(admins_sql)
 
+        # Create the seed urls table
+        seed_urls_sql = """CREATE TABLE seed_urls ( 
+            id SERIAL PRIMARY KEY,
+            url VARCHAR(2048) NOT NULL
+        );"""
+
+        await client.execute(seed_urls_sql)
+
         yield client
 
     finally:
 
         await client.execute("DROP TABLE resources")
         await client.execute("DROP TABLE admins")
+        await client.execute("DROP TABLE seed_urls")
 
         await client.close()
 
