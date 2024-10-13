@@ -105,3 +105,96 @@ async def test_get_admin(valid_token):
     print(response.text)
 
     assert "<html><body>Admin Page</body></html>" in response.text
+
+
+@pytest.mark.asyncio
+async def test_add_seed_url(valid_token, empty_postgres_client):
+    """
+    Checks the add_seed_url endpoint correctly adds a seed url to the
+    database with a valid token.
+    """
+
+    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": "https://example.com"},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        # Check the url was added to the database
+        results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+        assert len(results) == 1
+        assert results[0][0] == 1
+        assert results[0][1] == "https://example.com"
+
+
+@pytest.mark.asyncio
+async def test_add_seed_url_without_valid_token(empty_postgres_client):
+    """
+    Checks the add_seed_url endpoint correctly rejects a request with
+    an invalid token.
+    """
+
+    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer this_is_some_invalid_token"},
+            json={"url": "https://example.com"},
+        )
+
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Invalid credentials"}
+
+        # Check the url was added to the database
+        results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+        assert len(results) == 0
+
+
+@pytest.mark.asyncio
+async def test_delete_seed_url(valid_token, empty_postgres_client):
+    """
+    Checks the delete_seed_url endpoint correctly deletes a seed url
+    from the database with a valid token.
+    """
+
+    app.dependency_overrides[get_postgres_client] = lambda: empty_postgres_client
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Add a seed url to the database
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": "https://example.com"},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        response = await ac.post(
+            "/delete-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": "https://example.com"},
+        )
+
+        # Check the url was deleted from the database
+        results = await empty_postgres_client.fetch("SELECT * FROM seed_urls")
+
+        assert len(results) == 0
