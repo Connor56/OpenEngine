@@ -4,6 +4,7 @@ import qdrant_client
 import numpy as np
 from qdrant_client.models import VectorParams, Distance
 from datetime import datetime
+from app.models.data_types import CrawledUrl, PotentialUrl
 
 
 @pytest.mark.asyncio
@@ -181,3 +182,39 @@ async def test_delete_seed_url(empty_postgres_client):
 
     # Was it added correctly?
     assert len(results) == 0
+@pytest.mark.asyncio
+async def test_add_potential_url(empty_postgres_client):
+    """
+    Checks that the add_potential_urls function correctly adds a
+    potential url to the database.
+    """
+
+    url = "https://example.com"
+    time_seen = datetime.now()
+
+    # Add the url to the database
+    assert await st.add_potential_url(url, time_seen, empty_postgres_client)
+
+    # Get the resource from the database
+    results = await empty_postgres_client.fetch("SELECT * FROM potential_urls")
+
+    # Was it added correctly?
+    assert len(results) == 1
+    assert results[0][0] == 1
+    assert results[0][1] == url
+    assert results[0][2] == time_seen
+    assert results[0][3] == 1
+
+    # Attempt to add the same url again
+    assert await st.add_potential_url(url, time_seen, empty_postgres_client)
+
+    # Check this increments the timesSeen column
+    results = await empty_postgres_client.fetch("SELECT * FROM potential_urls")
+
+    assert len(results) == 1
+    assert results[0][0] == 1
+    assert results[0][1] == url
+    assert results[0][2] == time_seen
+    assert results[0][3] == 2
+
+@pytest.mark.asyncio

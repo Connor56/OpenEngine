@@ -146,17 +146,23 @@ async def log_resource(
         return False
 
 
-async def add_seed_url(
+async def add_potential_url(
     url: str,
+    time_seen: datetime,
     db_client: asyncpg.Connection,
 ) -> bool:
     """
-    Adds a new seed url to the database.
+    Adds a new potential url to the database, that isn't crawled
+    but could be added to the crawlable set of urls in the future.
 
     Parameters
     ----------
     url : str
         The url to add.
+
+    time_seen : datetime
+        The time the url was seen. Will only be stored if this is
+        the first time the url has been seen.
 
     db_client : asyncpg.Connection
         The PostgreSQL client to use.
@@ -167,9 +173,45 @@ async def add_seed_url(
         True if the url was added successfully, False otherwise.
     """
     # Check the url is valid
-    parsed = urlparse(url)
+    if not check_url(url):
+        print("Invalid url:", url)
 
-    if not bool(parsed.scheme) and bool(parsed.netloc):
+        return False
+
+    # Check the url hasn't already been added
+    query = "SELECT * FROM potential_urls WHERE url = $1"
+    result = await db_client.fetchrow(query, url)
+
+    # If the url has already been added, update the timesSeen
+    if result is not None:
+        print("Url already added:", url)
+
+        query = (
+            "UPDATE potential_urls SET timesSeen = timesSeen + 1 WHERE url = $1"
+        )
+
+        await db_client.execute(query, url)
+
+        return True
+
+    # Create a tuple of the resource's attributes
+    attributes = (url, time_seen, 1)
+
+    # Log the potential url in the database
+    try:
+
+        await db_client.execute(
+            "INSERT INTO potential_urls (url, firstSeen, timesSeen) VALUES ($1, $2, $3)",
+            *attributes,
+        )
+
+        return True
+
+    except Exception as e:
+        print("Failed to add url with error:", e)
+
+        return False
+
         print("Invalid url:", url)
 
         return False

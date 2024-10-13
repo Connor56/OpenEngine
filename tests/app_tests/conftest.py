@@ -129,13 +129,24 @@ async def empty_postgres_client(base_postgres_details: str):
 
         await client.execute(seed_urls_sql)
 
+        potential_urls_sql = """CREATE TABLE potential_urls ( 
+            id SERIAL PRIMARY KEY,
+            url VARCHAR(2048) NOT NULL,
+            firstSeen TIMESTAMP NOT NULL,
+            timesSeen INT DEFAULT 1
+        );"""
+
+        await client.execute(potential_urls_sql)
+
         yield client
 
     finally:
 
+        # Clean up all the tables by dropping them
         await client.execute("DROP TABLE resources")
         await client.execute("DROP TABLE admins")
         await client.execute("DROP TABLE seed_urls")
+        await client.execute("DROP TABLE potential_urls")
 
         await client.close()
 
