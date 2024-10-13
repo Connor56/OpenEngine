@@ -212,6 +212,29 @@ async def add_potential_url(
 
         return False
 
+
+async def add_seed_url(
+    url: str,
+    db_client: asyncpg.Connection,
+) -> bool:
+    """
+    Adds a new seed url to the database.
+
+    Parameters
+    ----------
+    url : str
+        The url to add.
+
+    db_client : asyncpg.Connection
+        The PostgreSQL client to use.
+
+    Returns
+    -------
+    bool
+        True if the url was added successfully, False otherwise.
+    """
+    # Check the url is valid and return false if it isn't
+    if not check_url(url):
         print("Invalid url:", url)
 
         return False
@@ -271,3 +294,5 @@ async def delete_seed_url(
         print("Failed to delete url with error:", e)
 
         return False
+
+
