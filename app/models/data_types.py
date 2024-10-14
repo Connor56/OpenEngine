@@ -14,7 +14,8 @@ class Token(BaseModel):
 
 
 class CrawlToken(BaseModel):
-    token: str
+    streamToken: str | None
+    message: str
 
 
 class SeedUrl(BaseModel):
