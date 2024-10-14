@@ -89,10 +89,25 @@ async def crawler(
     """
     num_iter = 0
     print("max_iter:", max_iter)
-    while not pause.is_set():
+    while True:
         # Crawler ended?
         if end.is_set():
             break
+
+        # Crawler paused?
+        if pause.is_set():
+            # Clear the pause event
+            pause.clear()
+
+            print("paused crawler", flush=True)
+
+            # Wait until it's set again
+            await pause.wait()
+
+            print("resumed crwaler", flush=True)
+
+            # Then clear it again this implements a toggle
+            pause.clear()
 
         # Max crawl iterations reached?
         if max_iter != -1 and num_iter >= max_iter:
