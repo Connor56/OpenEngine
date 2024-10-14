@@ -37,6 +37,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 postgres_client = None
 qdrant_client = None
 
+# Global crawl events
+crawl_pause = None
+crawl_end = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -81,6 +85,23 @@ async def get_qdrant_client():
     much simpler to mock the client in tests.
     """
     return qdrant_client
+
+
+async def get_crawl_pause():
+    """
+    Gets the crawl pause event after the lifespan has set it up. Makes
+    it much simpler to mock the event in tests.
+    """
+    return crawl_pause
+
+
+async def get_crawl_end():
+    """
+    Gets the crawl end event after the lifespan has set it up. Makes
+    it much simpler to mock the event in tests.
+    """
+    global crawl_end
+    return crawl_end
 
 
 async def check_token(token: str = Depends(oauth2_scheme)):
