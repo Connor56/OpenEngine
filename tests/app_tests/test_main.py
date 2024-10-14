@@ -544,3 +544,94 @@ async def test_start_crawl(
     assert results[1][5][0] == f"{local_site}/page1.html"
 
 
+@pytest.mark.asyncio
+async def test_stop_crawl(
+    valid_token,
+    empty_postgres_client,
+    vector_client,
+    local_site,
+):
+    """
+    Test the stop_crawl endpoint correctly stops a crawl.
+    """
+
+    # Override fastapi dependency to use test postgres client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    # Override fastapi dependency to use test vector client
+    app.dependency_overrides[get_qdrant_client] = lambda: vector_client
+
+    # Get the local site url to crawl
+    server_url = local_site + "/page1.html"
+
+    print(server_url)
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Add the test url to the seed urls
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": server_url},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        # Start a crawl
+        response = await ac.post(
+            "/start-crawl",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={
+                "regex": ["https://", "http://"],
+                "max_iter": 4,
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "message": "Crawl started successfully",
+            "streamToken": None,
+        }
+
+        # Stop the crawl
+        response = await ac.post(
+            "/stop-crawl",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"streamToken": None},
+        )
+
+        await asyncio.sleep(1)
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Crawl stopped successfully"}
+
+    # Check the vectors and metadata were stored correctly
+    points = await vector_client.scroll(
+        collection_name="embeddings",
+        with_payload=True,
+        with_vectors=True,
+    )
+
+    points = await vector_client.scroll(
+        collection_name="embeddings", with_payload=True, with_vectors=True
+    )
+
+    points = points[0]
+
+    print("Vectors stored:", len(points))
+
+    assert len(points) < 4
+
+    # Check the database has the correct number of resources
+    results = await empty_postgres_client.fetch("SELECT * FROM resources")
+
+    print("Result length:", len(results))
+
+    assert len(results) < 4
+
+
