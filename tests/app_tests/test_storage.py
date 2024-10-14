@@ -4,7 +4,8 @@ import qdrant_client
 import numpy as np
 from qdrant_client.models import VectorParams, Distance
 from datetime import datetime
-from app.models.data_types import CrawledUrl, PotentialUrl
+from app.models.data_types import CrawledUrl, PotentialUrl, SeedUrl
+from typing import List
 
 
 @pytest.mark.asyncio
@@ -231,7 +232,7 @@ async def test_get_seed_urls(empty_postgres_client):
         assert await st.add_seed_url(url, empty_postgres_client)
 
     # Get the seed urls
-    results = await st.get_seed_urls(empty_postgres_client)
+    results: list[SeedUrl] = await st.get_seed_urls(empty_postgres_client)
 
     # Check the urls are correct
     assert len(results) == len(urls_to_add)
@@ -239,7 +240,9 @@ async def test_get_seed_urls(empty_postgres_client):
     # Put urls to add into the expected format
     urls_to_add = [{"url": url} for url in urls_to_add]
 
-    assert results == urls_to_add
+    assert results[0].model_dump() == urls_to_add[0]
+    assert results[1].model_dump() == urls_to_add[1]
+    assert results[2].model_dump() == urls_to_add[2]
 
 
 @pytest.mark.asyncio
