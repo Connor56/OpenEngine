@@ -111,6 +111,16 @@ async def check_token(token: str = Depends(oauth2_scheme)):
     return auth.check_access_token(token)
 
 
+async def get_embedding_model():
+    """
+    Gets the embedding model after the lifespan has set it up. Makes
+    it much simpler to mock the model in tests.
+    """
+    return sentence_transformers.SentenceTransformer(
+        "multi-qa-MiniLM-L6-cos-v1"
+    )
+
+
 @app.post("/login", response_model=Token)
 async def admin_login(
     login_data: LoginData,
