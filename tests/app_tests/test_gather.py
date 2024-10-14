@@ -3,6 +3,7 @@ import app.core.gather as gather
 from qdrant_client.models import VectorParams, Distance
 import datetime
 import app.core.storage as st
+import asyncio
 
 
 @pytest.mark.asyncio
@@ -39,6 +40,10 @@ async def test_gather(
 
     assert stored
 
+    # Set up asyncio events
+    pause = asyncio.Event()
+    end = asyncio.Event()
+
     await gather.gather(
         vector_client,
         db_client,
@@ -46,6 +51,8 @@ async def test_gather(
         revisit_delta=datetime.timedelta(microseconds=0),
         max_iter=4,
         regex_patterns=["https://", "http://"],
+        pause=pause,
+        end=end,
     )
 
     # Check the vectors and metadata were stored correctly
