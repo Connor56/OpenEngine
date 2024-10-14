@@ -20,6 +20,7 @@ from app.models.data_types import (
     UrlUpdateData,
     CrawledUrl,
     PotentialUrl,
+    CrawlData,
 )
 from dotenv import load_dotenv
 import asyncpg
@@ -27,6 +28,9 @@ from qdrant_client import AsyncQdrantClient
 import os
 import app.core.storage as storage
 from fastapi.responses import HTMLResponse
+import asyncio
+import app.core.gather as gather
+import sentence_transformers
 
 load_dotenv(dotenv_path="../.env")
 
@@ -283,14 +287,50 @@ async def update_seed_url(
 
 @app.post("/start-crawl", response_model=CrawlToken)
 async def start_crawl(
+    crawl_data: CrawlData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
     qdrant_client=Depends(get_qdrant_client),
+    embedding_model=Depends(get_embedding_model),
 ):
     """
     Start the url crawling process.
     """
-    pass
+    # Check if the token is valid
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    print("crawl data:", crawl_data)
+
+    # Set up the events for starting and stopping the crawler
+    pause = asyncio.Event()
+    end = asyncio.Event()
+
+    # Set the global variables for the crawler
+    global crawl_pause
+    global crawl_end
+
+    crawl_pause = pause
+    crawl_end = end
+
+    # Set up the crawler
+    asyncio.create_task(
+        gather.gather(
+            qdrant_client,
+            postgres_client,
+            embedding_model,
+            max_iter=crawl_data.max_iter,
+            regex_patterns=crawl_data.regex,
+            pause=pause,
+            end=end,
+        )
+    )
+
+    return {"message": "Crawl started successfully", "streamToken": None}
 
 
 @app.post("/stop-crawl")
