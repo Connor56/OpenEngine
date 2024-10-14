@@ -30,7 +30,6 @@ def local_site():
 
     # Define the handler to serve the directory
     handler = http.server.SimpleHTTPRequestHandler
-    # handler.directory = str(site_directory)  # Set the directory to serve files from
 
     # Define the server (localhost with a random available port)
     with socketserver.TCPServer(("", 0), handler) as httpd:
