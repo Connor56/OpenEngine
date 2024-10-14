@@ -24,9 +24,11 @@ async def gather(
     vector_client: AsyncQdrantClient,
     db_client: asyncpg.Connection,
     model: sentence_transformers.SentenceTransformer,
-    revisit_delta: datetime.timedelta = datetime.timedelta(days=1),
-    max_iter: int = -1,
-    regex_patterns: List[str] | None = None,
+    pause: asyncio.Event,
+    end: asyncio.Event,
+    revisit_delta: Optional[datetime.timedelta] = datetime.timedelta(days=1),
+    max_iter: Optional[int] = -1,
+    regex_patterns: Optional[List[str]] | None = None,
 ):
     """
     Sets up the queues for the crawler and processor and starts the
@@ -43,6 +45,13 @@ async def gather(
 
     model : sentence_transformers.SentenceTransformer
         The sentence_transformers model to use for storing vectors.
+
+    pause : asyncio.Event
+        The event to pause the crawler's while loop. This lets you
+        stop and start the crawler.
+
+    end : asyncio.Event
+        Ends the crawler's while loop.
 
     revisit_delta : datetime.timedelta, optional
         The delta to use for revisiting a resource. Defaults to 1 day.
@@ -63,12 +72,6 @@ async def gather(
 
     # Create a queue for the processor
     response_queue = asyncio.Queue()
-
-    # Event to pause crawler and processor
-    pause = asyncio.Event()
-
-    # Event to end crawler and processor
-    end = asyncio.Event()
 
     # Create a list to store seen urls
     seen_urls = AsyncList()
