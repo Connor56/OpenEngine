@@ -1,9 +1,10 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
-from app.main import app, get_postgres_client, get_admin_page
+from app.main import app, get_postgres_client, get_admin_page, get_qdrant_client
 from app.auth.auth import set_credentials
 from fastapi.responses import JSONResponse
 from datetime import datetime
+import asyncio
 
 
 @pytest.mark.asyncio
@@ -446,3 +447,100 @@ async def test_get_potential_urls(
         assert potential_urls[0]["url"] == "https://snowchild.com"
         assert potential_urls[0]["firstSeen"] is not None
         assert potential_urls[0]["timesSeen"] == 1
+
+
+@pytest.mark.asyncio
+async def test_start_crawl(
+    valid_token,
+    empty_postgres_client,
+    vector_client,
+    local_site,
+):
+    """
+    Checks the start_crawl endpoint correctly starts a crawl and
+    searches a webpage.
+    """
+
+    # Override fastapi dependency to use test postgres client
+    app.dependency_overrides[get_postgres_client] = (
+        lambda: empty_postgres_client
+    )
+
+    # Override fastapi dependency to use test vector client
+    app.dependency_overrides[get_qdrant_client] = lambda: vector_client
+
+    # Get the local site url to crawl
+    server_url = local_site + "/page1.html"
+
+    print(server_url)
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        # Add the test url to the seed urls
+        response = await ac.post(
+            "/add-seed-url",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={"url": server_url},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "Seed url added successfully"}
+
+        # Start a crawl
+        response = await ac.post(
+            "/start-crawl",
+            headers={"Authorization": f"Bearer {valid_token}"},
+            json={
+                "regex": ["https://", "http://"],
+                "max_iter": 4,
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "message": "Crawl started successfully",
+            "streamToken": None,
+        }
+
+        await asyncio.sleep(5)
+
+        # Stop the crawl
+        response = await ac.post(
+            "/stop-crawl",
+            headers={"Authorization": f"Bearer {valid_token}"},
+        )
+
+    # Check the vectors and metadata were stored correctly
+    points = await vector_client.scroll(
+        collection_name="embeddings",
+        with_payload=True,
+        with_vectors=True,
+    )
+
+    points = await vector_client.scroll(
+        collection_name="embeddings", with_payload=True, with_vectors=True
+    )
+
+    points = points[0]
+
+    assert len(points) == 4
+
+    # Check the database has the correct number of resources
+    results = await empty_postgres_client.fetch("SELECT * FROM resources")
+    assert len(results) == 4
+
+    # Check the set of urls stored is the same
+    vector_urls = [p.payload["text"]["url"] for p in points]
+    db_urls = [r[1] for r in results]
+    assert set(vector_urls) == set(db_urls)
+
+    # Check the links and the urls are correct
+    assert results[0][1] == server_url
+    assert results[0][5][0] == f"{local_site}/page2.html"
+
+    assert results[1][1] == f"{local_site}/page2.html"
+    assert results[1][5][0] == f"{local_site}/page1.html"
+
+
