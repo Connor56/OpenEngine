@@ -141,7 +141,9 @@ async def process_html_to_vectors(
     splits.append(len(split_text))
 
     # Create the sequences
-    sequences = [" ".join(split_text[i:j]) for i, j in zip(splits[:-1], splits[1:])]
+    sequences = [
+        " ".join(split_text[i:j]) for i, j in zip(splits[:-1], splits[1:])
+    ]
 
     # Turns the sequences into float16 vectors
     vectors = model.encode(sequences, convert_to_numpy=True)
