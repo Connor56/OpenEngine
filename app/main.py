@@ -354,16 +354,27 @@ async def stop_crawl(
     return {"message": "Crawl stopped successfully"}
 
 
-@app.post("/pause-crawl")
-async def pause_crawl(
-    crawl_token: CrawlToken,
+@app.post("/toggle-crawl")
+async def toggle_crawl(
+    crawl_pause=Depends(get_crawl_pause),
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
     """
-    Uses a crawl token to find the crawling process and pause it.
+    Toggle's a crawls state, if it's paused it will be resumed,
+    if it's running it will be paused. Setting the event works fir
     """
-    pass
+    # Check if the token is valid
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Toggle the pause event
+    crawl_pause.set()
+    return {"message": "Crawl toggled successfully"}
 
 
 @app.get("/get-seed-urls", response_model=list[SeedUrl])
