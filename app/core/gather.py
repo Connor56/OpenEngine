@@ -113,7 +113,7 @@ async def gather(
     print("seen urls:", seen_urls)
 
     # Create a process coroutine
-    task = asyncio.create_task(
+    process_task = asyncio.create_task(
         process(
             response_queue,
             model,
@@ -125,7 +125,7 @@ async def gather(
         )
     )
 
-    print("task:", task)
+    print("task:", process_task)
 
     # Filter patterns for urls
     url_filter = {
@@ -138,17 +138,19 @@ async def gather(
     }
 
     # Create a crawler coroutine
-    await crawler(
-        url_queue,
-        url_filter=url_filter,
-        client=client,
-        response_queue=response_queue,
-        pause=pause,
-        end=end,
-        seen_urls=seen_urls,
-        max_iter=max_iter,
+    crawler_task = asyncio.create_task(
+        crawler(
+            url_queue,
+            url_filter=url_filter,
+            client=client,
+            response_queue=response_queue,
+            pause=pause,
+            end=end,
+            seen_urls=seen_urls,
+            max_iter=max_iter,
+        )
     )
 
     # Wait for the process coroutine to finish
-    end.set()
-    await task
+    await process_task
+    await crawler_task
