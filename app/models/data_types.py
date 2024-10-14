@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional, List
 
 
 class LoginData(BaseModel):
@@ -37,3 +38,8 @@ class PotentialUrl(BaseModel):
 class UrlUpdateData(BaseModel):
     url: str
     old_url: str
+
+
+class CrawlData(BaseModel):
+    regex: Optional[List[str]]
+    max_iter: Optional[int]
