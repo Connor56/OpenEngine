@@ -15,7 +15,7 @@ from datetime import datetime
 import asyncpg
 from uuid import uuid4
 from urllib.parse import urlparse
-from app.models.data_types import CrawledUrl, PotentialUrl
+from app.models.data_types import CrawledUrl, PotentialUrl, SeedUrl
 from app.core.utility import check_url
 
 
@@ -342,7 +342,7 @@ async def update_seed_url(
 
 async def get_seed_urls(
     postgres_client: asyncpg.Connection,
-) -> list[str]:
+) -> list[SeedUrl]:
     """
     Gets a list of seed urls from the database.
 
@@ -353,14 +353,14 @@ async def get_seed_urls(
 
     Returns
     -------
-    list[str]
+    list[SeedUrl]
         A list of seed urls.
     """
     # Get the seed urls from the database
     results = await postgres_client.fetch("SELECT * FROM seed_urls")
 
     # Convert the results to a list of urls
-    urls = [{"url": result[1]} for result in results]
+    urls = [SeedUrl(url=result[1]) for result in results]
 
     return urls
 
