@@ -335,14 +335,23 @@ async def start_crawl(
 
 @app.post("/stop-crawl")
 async def stop_crawl(
-    crawl_token: CrawlToken,
+    crawl_end=Depends(get_crawl_end),
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
     """
     Uses a crawl token to find the crawling process and stop it.
     """
-    pass
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    crawl_end.set()
+
+    return {"message": "Crawl stopped successfully"}
 
 
 @app.post("/pause-crawl")
