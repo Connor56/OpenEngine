@@ -17,7 +17,8 @@ from .process import process
 import datetime
 import httpx
 from urllib.parse import urlparse
-from typing import List
+from typing import List, Optional
+from app.core.storage import get_seed_urls
 
 
 async def gather(
@@ -64,7 +65,8 @@ async def gather(
         This is for testing purposes.
 
     regex_patterns : List[str] | None, optional
-        A list of regex patterns to filter urls by.
+        A list of regex patterns to filter urls by. Generally this
+        could be something like a set of seed urls to crawl. If
     """
 
     # Create a queue for the crawler
@@ -79,12 +81,21 @@ async def gather(
     # Create an httpx client
     client = httpx.AsyncClient(follow_redirects=True)
 
+    # Get the Seed urls
+    seed_urls = await get_seed_urls(db_client)
+
+    seed_urls = [url.url for url in seed_urls]
+
     # Get all the urls from the postgres database
     all_urls = await db_client.fetch("SELECT url, lastVisited FROM resources")
 
     # Filter out the urls to be revisited
     current_time = datetime.datetime.now()
-    retry_urls = [url[0] for url in all_urls if current_time - url[1] > revisit_delta]
+    retry_urls = [
+        url[0] for url in all_urls if current_time - url[1] > revisit_delta
+    ]
+
+    retry_urls += seed_urls
 
     print("retry urls:", retry_urls)
 
