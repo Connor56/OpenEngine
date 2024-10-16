@@ -729,7 +729,7 @@ async def test_toggle_crawl(
         assert response.status_code == 200
         assert response.json() == {"message": "Crawl toggled successfully"}
 
-        await asyncio.sleep(50)
+        await asyncio.sleep(5)
 
     # Check the vectors and metadata were stored correctly
     points = await vector_client.scroll(
