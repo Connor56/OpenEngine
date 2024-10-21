@@ -7,3 +7,7 @@ notes*
 
 # Environment variables
 *.env
+
+# Static site files
+static_site
+app/backend_files
