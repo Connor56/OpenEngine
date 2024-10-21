@@ -5,7 +5,8 @@
 	import type { Result } from '$lib/types';
 	import ResultCard from '$lib/components/ResultCard.svelte';
 
-	let query = '';
+	let query: string | null = '';
+
 	let results: Result[] = [
 		{
 			title: 'Example Title',
@@ -29,12 +30,11 @@
 		}
 	];
 
-	$: query = $page.url.searchParams.get('query') || '';
 	let API_URL: string = '';
 
 	onMount(async () => {
 		// Get query parameter from the URL
-		console.log(query);
+		query = $page.url.searchParams.get('query');
 
 		if (query) {
 			await fetchResults();
