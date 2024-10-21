@@ -1,16 +1,15 @@
 <script lang="ts">
 	import SearchBar from '$lib/components/SearchBar.svelte';
 
-	let query = '';
-
-	function handleSearch() {
+	function handleSearch(query: string) {
 		// Navigate to the results page with the query as a URL parameter
+		console.log(query);
 		window.location.href = `/results?query=${encodeURIComponent(query)}`;
 	}
 
 	const handleKeyPress = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
-			handleSearch();
+			handleSearch(event?.target?.value);
 		}
 	};
 </script>
