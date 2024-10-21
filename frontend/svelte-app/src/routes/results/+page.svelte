@@ -30,6 +30,7 @@
 	];
 
 	$: query = $page.url.searchParams.get('query') || '';
+	let API_URL: string = '';
 
 	onMount(async () => {
 		// Get query parameter from the URL
@@ -38,6 +39,13 @@
 		if (query) {
 			await fetchResults();
 		}
+
+		let response = await fetch('/env.json');
+		const env = await response.json();
+
+		API_URL = env.API_URL;
+
+		console.log(API_URL);
 	});
 
 	async function fetchResults() {
