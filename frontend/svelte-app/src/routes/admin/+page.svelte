@@ -3,6 +3,7 @@
 	import UrlPanel from '$lib/components/UrlPanel.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import type { Url } from '$lib/types';
+	import { onMount } from 'svelte';
 
 	let seedUrls: Url[] = [
 		{
@@ -28,6 +29,27 @@
 		let selectedUrl = seedUrls[index];
 		alert(selectedUrl.url);
 	}
+
+	let API_URL: string;
+
+	onMount(async () => {
+		let response = await fetch('/env.json');
+		const env = await response.json();
+
+		// Get the API_URL
+		API_URL = env.API_URL;
+
+		response = await fetch(`${API_URL}/get-seed-urls`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer askldjklasdjf` // Add the Authorization header
+			}
+		});
+
+		let urls = await response.json();
+		console.log(urls);
+	});
 </script>
 
 <container>
