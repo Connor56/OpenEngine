@@ -33,7 +33,11 @@ import asyncio
 import app.core.gather as gather
 import sentence_transformers
 
-load_dotenv(dotenv_path="../.env")
+containing_dir = os.path.dirname(__file__)
+parent_dir = "/".join(containing_dir.split("/")[:-1])
+env_file = parent_dir + "/.env"
+
+load_dotenv(dotenv_path=env_file)
 
 # OAuth2 scheme setup (even though we're just using JWT, it's needed here)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
