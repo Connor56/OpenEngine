@@ -8,6 +8,7 @@ Created:
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from typing import Optional
@@ -73,6 +74,18 @@ async def lifespan(app: FastAPI):
 
 # Set up the FastAPI app with lifespan
 app = FastAPI(lifespan=lifespan)
+
+# Add middleware to allow CORS
+# TODO: Probably drop this when in production.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*"
+    ],  # Allows requests from any origin (change this in production for security)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers, including Authorization
+)
 
 
 async def get_postgres_client():
