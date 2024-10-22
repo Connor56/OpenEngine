@@ -47,8 +47,7 @@
 			}
 		});
 
-		let urls = await response.json();
-		console.log(urls);
+		seedUrls = await response.json();
 	});
 </script>
 
