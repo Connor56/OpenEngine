@@ -36,23 +36,23 @@
 		// Get query parameter from the URL
 		query = $page.url.searchParams.get('query');
 
-		if (query) {
-			await fetchResults();
-		}
-
+		// Load the environment variables
 		let response = await fetch('/env.json');
 		const env = await response.json();
 
+		// Get the API_URL
 		API_URL = env.API_URL;
 
 		console.log(API_URL);
+
+		if (query) {
+			await fetchResults();
+		}
 	});
 
 	async function fetchResults() {
 		try {
-			const response = await fetch(
-				`http://localhost:8000/api/search?query=${encodeURIComponent(query)}`
-			);
+			const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}`);
 			if (response.ok) {
 				const data = await response.json();
 				results = data.results;
