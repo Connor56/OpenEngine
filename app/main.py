@@ -142,6 +142,22 @@ async def get_embedding_model():
     return sentence_transformers.SentenceTransformer(
         "multi-qa-MiniLM-L6-cos-v1"
     )
+def check_auth(token: str):
+    """
+    Checks the authorisation of a user and raises an error if they
+    don't have authorisation. Allows anything through if the site is on
+    dev mode.
+    """
+    # Skip the check when in DEV mode
+    if os.getenv("DEV") == "true":
+        return
+
+    if not auth.check_access_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @app.post("/login", response_model=Token)
