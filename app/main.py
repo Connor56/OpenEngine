@@ -247,12 +247,7 @@ async def get_admin(
     Get the admin frontend for the user to work with and make admin
     changes to the backend of the site.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     return HTMLResponse(content=page)
 
@@ -266,12 +261,7 @@ async def add_seed_url(
     """
     Add a new url to the seed urls table in the database.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     # Add the url to the database
     await storage.add_seed_url(url.url, postgres_client)
@@ -287,12 +277,7 @@ async def delete_seed_url(
     """
     Delete a url from the seed urls table in the database.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     # Delete the url from the database
     await storage.delete_seed_url(url.url, postgres_client)
@@ -307,13 +292,7 @@ async def update_seed_url(
     """
     Update an url in the seed urls table in the database.
     """
-    # Check if the credentials are correct
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     # Update the url in the database
     await storage.update_seed_url(url.old_url, url.url, postgres_client)
@@ -331,13 +310,7 @@ async def start_crawl(
     """
     Start the url crawling process.
     """
-    # Check if the token is valid
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     print("crawl data:", crawl_data)
 
@@ -377,12 +350,7 @@ async def stop_crawl(
     """
     Uses a crawl token to find the crawling process and stop it.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     crawl_end.set()
 
@@ -399,13 +367,7 @@ async def toggle_crawl(
     Toggle's a crawls state, if it's paused it will be resumed,
     if it's running it will be paused. Setting the event works fir
     """
-    # Check if the token is valid
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     # Toggle the pause event
     crawl_pause.set()
@@ -420,12 +382,7 @@ async def get_seed_urls(
     """
     Get the seed urls from the database.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     return await storage.get_seed_urls(postgres_client)
 
@@ -440,12 +397,7 @@ async def get_crawled_urls(
     that have been crawled, processed, and stored in a row in
     postgres.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     return await storage.get_crawled_urls(postgres_client)
 
@@ -460,11 +412,6 @@ async def get_potential_urls(
     that have been seen during crawls but discarded because they
     didn't pass the filter algorithms.
     """
-    if not auth.check_access_token(token):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    check_auth(token)
 
     return await storage.get_potential_urls(postgres_client)
