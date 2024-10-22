@@ -75,6 +75,8 @@ async def lifespan(app: FastAPI):
         port=os.getenv("QDRANT_PORT"),
     )
 
+    yield
+
 
 # Set up the FastAPI app with lifespan
 app = FastAPI(lifespan=lifespan)
