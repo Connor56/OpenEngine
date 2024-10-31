@@ -8,7 +8,7 @@
 	let coreResources: Url[];
 
 	let adminLocation = 'seed-urls';
-	let selected = '';
+	let selectedResource: Url = { url: '', faviconLocation: '', seeds: [] };
 	let loading = true;
 
 	function handleNav(event: Event) {
@@ -70,11 +70,16 @@
 					{/if}
 				</div>
 				<div class="url-meta standard-pane">
-					<h2>Url Information</h2>
+					<h2>Resource Management</h2>
+					<h3>Seeds</h3>
+					<div class="resource-seeds">
+						{#each selectedResource.seeds as seed}
+							<div class="resource-seed">
+								<div class="resource-seed-name">{selectedResource.url}{seed}</div>
+							</div>
+						{/each}
+					</div>
 				</div>
-				<!-- <div class="url-investigation standard-pane">
-					<h2>Investigate Urls</h2>
-				</div> -->
 			</div>
 		{:else if adminLocation === 'crawl'}
 			<div class="crawl-grid">
@@ -149,6 +154,14 @@
 	.url-investigation {
 		grid-column: 2; /* Move to the second column */
 		grid-row: 4 / span 2; /* Span 1 row */
+	}
+
+	.resource-seed {
+		display: flex;
+		background-color: #e4e4e4;
+		border-radius: 0.5rem;
+		padding: 0.5rem;
+		margin: 0.5rem;
 	}
 
 	.standard-pane {
