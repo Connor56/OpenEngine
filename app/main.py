@@ -264,8 +264,11 @@ async def add_seed_url(
     check_auth(token)
 
     # Add the url to the database
-    await storage.add_seed_url(url.url, postgres_client)
-    return {"message": "Seed url added successfully"}
+    response = await storage.add_seed_url(url.url, postgres_client)
+    if response:
+        return {"message": "Seed url added successfully"}
+    else:
+        return {"message": "Failed to add seed url"}
 
 
 @app.post("/delete-seed-url")
