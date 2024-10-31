@@ -68,7 +68,8 @@ async def setup_postgres():
     # Create the seed urls table
     seed_urls_sql = """CREATE TABLE seed_urls ( 
         id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL
+        url VARCHAR(2048) NOT NULL,
+        seeds VARCHAR(512)[]
     );"""
 
     await client.execute(seed_urls_sql)
