@@ -5,16 +5,11 @@
 	import type { Url } from '$lib/types';
 	import { onMount } from 'svelte';
 
-	let coreResources: Url[] = [
-		{
-			url: 'https://github.com',
-			faviconLocation: 'github.webp'
-		}
-	];
-	let newUrl = '';
+	let coreResources: Url[];
 
 	let adminLocation = 'seed-urls';
 	let selected = '';
+	let loading = true;
 
 	function handleNav(event: Event) {
 		const target = event.target as HTMLElement;
@@ -36,7 +31,17 @@
 		// Get the API_URL
 		API_URL = env.API_URL;
 
-		response = await fetch(`${API_URL}/get-seed-urls`, {
+		// Reload the urls
+		await reloadUrls();
+
+		loading = false;
+	});
+
+	/**
+	 * Loads the core urls from the API.
+	 */
+	async function reloadUrls() {
+		const response = await fetch(`${API_URL}/get-seed-urls`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -44,8 +49,8 @@
 			}
 		});
 
-		// coreResources = await response.json();
-	});
+		coreResources = await response.json();
+	}
 </script>
 
 <container>
@@ -54,8 +59,15 @@
 		{#if adminLocation === 'seed-urls'}
 			<div class="seed-url-grid">
 				<div class="seed-url-pane standard-pane">
-					<h2>Core Urls</h2>
-					<UrlPanel {coreResources} {handleDelete} {handleSelect} {handleAdd} {selected} />
+					<h2>Core Resources</h2>
+					{#if !loading}
+						<UrlPanel
+							{coreResources}
+							{handleSelect}
+							selectedResource={selectedResource.url}
+							on:close={reloadUrls}
+						/>
+					{/if}
 				</div>
 				<div class="url-meta standard-pane">
 					<h2>Url Information</h2>
