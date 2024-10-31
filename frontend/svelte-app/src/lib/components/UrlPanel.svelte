@@ -4,10 +4,12 @@
 	import UrlEditModal from './UrlEditModal.svelte';
 
 	// Props for the component
-	export let selected: string = '';
+	export let selectedResource: string = '';
 	export let coreResources: Url[];
 	export let handleDelete: (index: number) => void;
 	export let handleSelect: (index: number) => void;
+
+	console.log(selectedResource);
 
 	let showModal = false;
 	let url: Url;
@@ -43,7 +45,7 @@
 			on:delete={() => handleDelete(index)}
 			on:select={() => handleSelect(index)}
 			on:edit={() => handleEdit(url)}
-			selected={url.url == selected}
+			selected={url.url == selectedResource}
 		/>
 	{/each}
 	<div class="button-container">
