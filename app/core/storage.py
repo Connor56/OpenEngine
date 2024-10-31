@@ -360,7 +360,7 @@ async def get_seed_urls(
     results = await postgres_client.fetch("SELECT * FROM seed_urls")
 
     # Convert the results to a list of urls
-    urls = [SeedUrl(url=result[1]) for result in results]
+    urls = [SeedUrl(url=result[1], seeds=result[2]) for result in results]
 
     return urls
 
