@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 
 	export let url: Url;
+	export let selected: boolean = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -13,14 +14,34 @@
 	function handleSelect() {
 		dispatch('select');
 	}
+
+	function handleEdit() {
+		dispatch('edit');
+	}
 </script>
 
-<div class="url-card">
+<div class="url-card {selected ? 'selected' : ''}">
 	<button on:click={handleSelect}>
 		<div class="url-card-content">
 			<img class="url-card-favicon" src={url.faviconLocation} alt="favicon" />
 			<a class="url-card-title">{url.url}</a>
 			<div class="interactions">
+				<button on:click={handleEdit} class="edit-button">
+					<svg
+						width="23"
+						height="23"
+						viewBox="0 0 80 80"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M56.6668 10C57.5422 9.12453 58.5816 8.43006 59.7254 7.95626C60.8693 7.48245 62.0953 7.23859 63.3334 7.23859C64.5715 7.23859 65.7975 7.48245 66.9414 7.95626C68.0853 8.43006 69.1246 9.12453 70.0001 10C70.8756 10.8755 71.57 11.9148 72.0438 13.0587C72.5176 14.2026 72.7615 15.4286 72.7615 16.6667C72.7615 17.9048 72.5176 19.1308 72.0438 20.2746C71.57 21.4185 70.8756 22.4579 70.0001 23.3333L25.0001 68.3333L6.66675 73.3333L11.6667 55L56.6668 10Z"
+							stroke-width="7"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
 				<a class="url-card-title" href={url.url}>
 					<svg class="external-link" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
 						<path
@@ -48,12 +69,27 @@
 		all: unset;
 	}
 
+	.edit-button {
+		margin-right: 10px;
+		stroke: #757575;
+	}
+
+	.edit-button:hover {
+		cursor: pointer;
+		stroke: black;
+	}
+
 	.url-card {
 		display: flex;
 		flex-direction: column;
 		border-radius: 10px;
 		padding: 10px;
 		margin-bottom: 10px;
+	}
+
+	.url-card.selected {
+		/* background-color: #e5f7ff; */
+		border: 1px solid #bbbbbb;
 	}
 
 	.url-card:hover {
