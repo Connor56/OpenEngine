@@ -20,6 +20,7 @@ class CrawlToken(BaseModel):
 
 class SeedUrl(BaseModel):
     url: str
+    seeds: list[str] | None
 
 
 class CrawledUrl(BaseModel):
