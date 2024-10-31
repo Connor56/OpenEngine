@@ -2,16 +2,20 @@
 	import type { Url } from '$lib/types';
 	import UrlCard from './UrlCard.svelte';
 	import UrlEditModal from './UrlEditModal.svelte';
+	import { createEventDispatcher } from 'svelte';
+	import UrlDeleteModal from './UrlDeleteModal.svelte';
 
 	// Props for the component
 	export let selectedResource: string = '';
 	export let coreResources: Url[];
-	export let handleDelete: (index: number) => void;
 	export let handleSelect: (index: number) => void;
 
 	console.log(selectedResource);
 
+	const dispatch = createEventDispatcher();
+
 	let showModal = false;
+	let showDeleteModal = false;
 	let url: Url;
 	let edit: boolean = false;
 
@@ -36,13 +40,26 @@
 		// Show the modal
 		showModal = true;
 	}
+
+	function handleDelete(deleteUrl: Url) {
+		// Set the url to delete
+		url = deleteUrl;
+
+		showDeleteModal = true;
+	}
+
+	function modalClose() {
+		showModal = false;
+		showDeleteModal = false;
+		dispatch('close');
+	}
 </script>
 
 <div class="url-panel">
 	{#each coreResources as url, index}
 		<UrlCard
 			{url}
-			on:delete={() => handleDelete(index)}
+			on:delete={() => handleDelete(url)}
 			on:select={() => handleSelect(index)}
 			on:edit={() => handleEdit(url)}
 			selected={url.url == selectedResource}
@@ -61,7 +78,10 @@
 		</button>
 	</div>
 	{#if showModal}
-		<UrlEditModal {url} {edit} on:close={() => (showModal = false)} />
+		<UrlEditModal {url} {edit} on:close={modalClose} />
+	{/if}
+	{#if showDeleteModal}
+		<UrlDeleteModal {url} on:close={modalClose} />
 	{/if}
 </div>
 
