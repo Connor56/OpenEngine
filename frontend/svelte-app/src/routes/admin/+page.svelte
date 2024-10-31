@@ -21,18 +21,10 @@
 		adminLocation = target.id;
 	}
 
-	function handleDelete(index: number) {
-		let removedUrl = coreResources[index];
-		coreResources = coreResources.filter((_, i) => i !== index);
-	}
-
 	function handleSelect(index: number) {
 		let selectedUrl = coreResources[index];
-		selected = selectedUrl.url;
-	}
-
-	function handleAdd() {
-		alert('add url');
+		selectedResource = selectedUrl;
+		selectedResource.seeds = ['/some/seed/url', '/another/seed/url'];
 	}
 
 	let API_URL: string;
