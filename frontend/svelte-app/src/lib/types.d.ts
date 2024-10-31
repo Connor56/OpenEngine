@@ -11,4 +11,5 @@ export type Result = {
 export type Url = {
 	url: string;
 	faviconLocation: string;
-}
+	seeds: string[];
+};
