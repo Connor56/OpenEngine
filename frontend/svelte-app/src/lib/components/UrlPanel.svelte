@@ -31,7 +31,8 @@
 	}
 
 	function handleAdd() {
-		url = { url: '', faviconLocation: '' };
+		// Set default values
+		url = { url: '', faviconLocation: '', seeds: [] };
 
 		edit = false;
 
