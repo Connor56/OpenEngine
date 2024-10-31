@@ -31,13 +31,10 @@
 	}
 
 	function handleAdd() {
-		// Add default values to the url
 		url = { url: '', faviconLocation: '' };
 
-		// Set edit to false
 		edit = false;
 
-		// Show the modal
 		showModal = true;
 	}
 
