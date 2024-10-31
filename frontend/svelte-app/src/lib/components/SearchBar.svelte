@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let handleKeyPress: (event: KeyboardEvent) => void;
 
-	let query = '';
+	export let query: string = '';
 </script>
 
 <div class="search-bar">

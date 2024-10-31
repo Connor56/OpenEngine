@@ -30,6 +30,8 @@
 		}
 	];
 
+	results = [];
+
 	let API_URL: string = '';
 
 	onMount(async () => {
@@ -72,7 +74,7 @@
 </script>
 
 <div class="top-bar horizontal-alignment">
-	<SearchBar {handleKeyPress} />
+	<SearchBar {handleKeyPress} {query} />
 </div>
 <hr />
 
