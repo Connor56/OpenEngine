@@ -5,7 +5,7 @@
 	import type { Url } from '$lib/types';
 	import { onMount } from 'svelte';
 
-	let seedUrls: Url[] = [
+	let coreResources: Url[] = [
 		{
 			url: 'https://github.com',
 			faviconLocation: 'github.webp'
@@ -14,6 +14,7 @@
 	let newUrl = '';
 
 	let adminLocation = 'seed-urls';
+	let selected = '';
 
 	function handleNav(event: Event) {
 		const target = event.target as HTMLElement;
@@ -21,13 +22,17 @@
 	}
 
 	function handleDelete(index: number) {
-		let removedUrl = seedUrls[index];
-		seedUrls = seedUrls.filter((_, i) => i !== index);
+		let removedUrl = coreResources[index];
+		coreResources = coreResources.filter((_, i) => i !== index);
 	}
 
 	function handleSelect(index: number) {
-		let selectedUrl = seedUrls[index];
-		alert(selectedUrl.url);
+		let selectedUrl = coreResources[index];
+		selected = selectedUrl.url;
+	}
+
+	function handleAdd() {
+		alert('add url');
 	}
 
 	let API_URL: string;
@@ -47,7 +52,7 @@
 			}
 		});
 
-		seedUrls = await response.json();
+		// coreResources = await response.json();
 	});
 </script>
 
@@ -57,15 +62,15 @@
 		{#if adminLocation === 'seed-urls'}
 			<div class="seed-url-grid">
 				<div class="seed-url-pane standard-pane">
-					<h2>Seed Urls</h2>
-					<UrlPanel {seedUrls} {handleDelete} {handleSelect} />
+					<h2>Core Urls</h2>
+					<UrlPanel {coreResources} {handleDelete} {handleSelect} {handleAdd} {selected} />
 				</div>
 				<div class="url-meta standard-pane">
-					<h2>Url Metadata</h2>
+					<h2>Url Information</h2>
 				</div>
-				<div class="url-investigation standard-pane">
+				<!-- <div class="url-investigation standard-pane">
 					<h2>Investigate Urls</h2>
-				</div>
+				</div> -->
 			</div>
 		{:else if adminLocation === 'crawl'}
 			<div class="crawl-grid">
@@ -134,7 +139,7 @@
 
 	.url-meta {
 		grid-column: 2; /* Move to the second column */
-		grid-row: 1 / span 3; /* Span 3 rows */
+		grid-row: 1 / span 5; /* Span 3 rows */
 	}
 
 	.url-investigation {
