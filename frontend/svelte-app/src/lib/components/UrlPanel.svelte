@@ -1,16 +1,50 @@
 <script lang="ts">
 	import type { Url } from '$lib/types';
 	import UrlCard from './UrlCard.svelte';
+	import UrlEditModal from './UrlEditModal.svelte';
 
-	export let seedUrls: Url[];
+	// Props for the component
+	export let selected: string = '';
+	export let coreResources: Url[];
 	export let handleDelete: (index: number) => void;
-	export let handleAdd: () => void;
 	export let handleSelect: (index: number) => void;
+
+	let showModal = false;
+	let url: Url;
+	let edit: boolean = false;
+
+	function handleEdit(editUrl: Url) {
+		// Tell the modal this is edit mode
+		edit = true;
+
+		// Set the url to the provided url to edit
+		url = editUrl;
+
+		// Show the modal
+		showModal = true;
+	}
+
+	function handleAdd() {
+		// Add default values to the url
+		url = { url: '', faviconLocation: '' };
+
+		// Set edit to false
+		edit = false;
+
+		// Show the modal
+		showModal = true;
+	}
 </script>
 
 <div class="url-panel">
-	{#each seedUrls as url, index}
-		<UrlCard {url} on:delete={() => handleDelete(index)} on:select={() => handleSelect(index)} />
+	{#each coreResources as url, index}
+		<UrlCard
+			{url}
+			on:delete={() => handleDelete(index)}
+			on:select={() => handleSelect(index)}
+			on:edit={() => handleEdit(url)}
+			selected={url.url == selected}
+		/>
 	{/each}
 	<div class="button-container">
 		<button on:click={handleAdd}>
@@ -24,6 +58,9 @@
 			</svg>
 		</button>
 	</div>
+	{#if showModal}
+		<UrlEditModal {url} {edit} on:close={() => (showModal = false)} />
+	{/if}
 </div>
 
 <style>
