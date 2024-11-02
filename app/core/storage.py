@@ -383,6 +383,46 @@ async def add_seed_to_url(
         return False
 
 
+async def delete_seed_from_url(
+    seed: str,
+    url: str,
+    postgres_client: asyncpg.Connection,
+):
+    """
+    Deletes a seed from an url in the database.
+    """
+    # Get the current array of seeds for the url
+    current_seeds = await postgres_client.fetchrow(
+        "SELECT seeds FROM seed_urls WHERE url = $1", url
+    )
+
+    current_seeds = current_seeds[0]
+
+    # Handle the case where the seed array is None
+    if current_seeds is None:
+        return (False, "Seed not in array")
+
+    # Check if the seed is already in the array
+    if seed not in current_seeds:
+        return (False, "Seed not in array")
+
+    # Else remove the seed from the array
+    current_seeds.remove(seed)
+
+    try:
+        # Update the array in the database
+        await postgres_client.execute(
+            "UPDATE seed_urls SET seeds = $1 WHERE url = $2", current_seeds, url
+        )
+
+        return (True, "Seed deleted successfully")
+
+    except Exception as e:
+        print("Failed to update url with error:", e)
+
+        return (False, "Failed to delete seed from url")
+
+
 async def get_seed_urls(
     postgres_client: asyncpg.Connection,
 ) -> list[SeedUrl]:
