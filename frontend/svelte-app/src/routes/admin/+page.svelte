@@ -21,7 +21,7 @@
 	function handleSelect(index: number) {
 		let selectedUrl = coreResources[index];
 		selectedResource = selectedUrl;
-		selectedResource.seeds = ['/some/seed/url', '/another/seed/url'];
+		urlIndex = index;
 	}
 
 	let API_URL: string;
@@ -52,6 +52,21 @@
 		});
 
 		coreResources = await response.json();
+	}
+
+	/**
+	 * Closes the seed modal, reloads the urls, and then updates the selected url to
+	 * use the appropriate core resource.
+	 */
+	async function seedModalClose() {
+		// Close the seed modal
+		seedModal = false;
+
+		// Reload the urls
+		await reloadUrls();
+
+		// Update the selected url
+		selectedResource = coreResources[urlIndex];
 	}
 </script>
 
