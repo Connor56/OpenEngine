@@ -126,7 +126,15 @@ port = 54678
 
 # Start the FastAPI backend
 fastapi_process = subprocess.Popen(
-    ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", str(port), "--reload"],
+    [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        str(port),
+        "--reload",
+    ],
 )
 
 print(fastapi_process.pid)
