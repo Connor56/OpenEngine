@@ -35,10 +35,19 @@ import asyncio
 import app.core.gather as gather
 import sentence_transformers
 
+# Get the files containing directory
 containing_dir = os.path.dirname(__file__)
+
+# Windows fix with their stupid backslash paths
+containing_dir = "/".join(containing_dir.split("\\"))
+
+# Get the parent directory
 parent_dir = "/".join(containing_dir.split("/")[:-1])
+
+# Get the env file from the parent directory
 env_file = parent_dir + "/.env"
 
+# Load the env file variables into the environment
 load_dotenv(dotenv_path=env_file)
 
 # OAuth2 scheme setup (even though we're just using JWT, it's needed here)
@@ -61,6 +70,8 @@ async def lifespan(app: FastAPI):
     """
     global postgres_client
     global qdrant_client
+
+    print(os.getenv("POSTGRES_USER"))
 
     # Set up the database clients
     postgres_client = await asyncpg.connect(
@@ -144,6 +155,8 @@ async def get_embedding_model():
     return sentence_transformers.SentenceTransformer(
         "multi-qa-MiniLM-L6-cos-v1"
     )
+
+
 def check_auth(token: str):
     """
     Checks the authorisation of a user and raises an error if they
