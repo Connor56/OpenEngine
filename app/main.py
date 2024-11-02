@@ -22,6 +22,7 @@ from app.models.data_types import (
     CrawledUrl,
     PotentialUrl,
     CrawlData,
+    SeedUpdateData,
 )
 from dotenv import load_dotenv
 import asyncpg
@@ -300,6 +301,32 @@ async def update_seed_url(
     # Update the url in the database
     await storage.update_seed_url(url.old_url, url.url, postgres_client)
     return {"message": "Seed url updated successfully"}
+
+
+@app.post("/update-seed-url-seed")
+async def update_seed_url(
+    seed_update: SeedUpdateData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Updates a seed that's stored against an url in the database. The seeds are basically
+    the initial pages to crawl associated with that url.
+    """
+    check_auth(token)
+
+    # Update the url in the database
+    result = await storage.update_seed_url_seed(
+        seed_update.old_seed,
+        seed_update.new_seed,
+        seed_update.url,
+        postgres_client,
+    )
+
+    if result[0]:
+        return {"message": "Seed updated successfully"}
+    else:
+        return {"message": result[1]}
 
 
 @app.post("/start-crawl", response_model=CrawlToken)
