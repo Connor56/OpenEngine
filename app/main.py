@@ -23,6 +23,7 @@ from app.models.data_types import (
     PotentialUrl,
     CrawlData,
     SeedUpdateData,
+    SeedAddDeleteData,
 )
 from dotenv import load_dotenv
 import asyncpg
@@ -327,6 +328,29 @@ async def update_seed_url(
         return {"message": "Seed updated successfully"}
     else:
         return {"message": result[1]}
+
+
+@app.post("/add-seed-to-url")
+async def add_seed_to_url(
+    seed_add: SeedAddDeleteData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Adds a seed to an url in the database.
+    """
+    check_auth(token)
+
+    # Add the seed to the url in the database
+    result = await storage.add_seed_to_url(
+        seed_add.seed,
+        seed_add.url,
+        postgres_client,
+    )
+    if result:
+        return {"message": "Seed added to url successfully"}
+    else:
+        return {"message": "Failed to add seed to url"}
 
 
 @app.post("/start-crawl", response_model=CrawlToken)
