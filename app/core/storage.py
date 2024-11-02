@@ -423,6 +423,48 @@ async def delete_seed_from_url(
         return (False, "Failed to delete seed from url")
 
 
+async def update_seed_url_seed(
+    old_seed: str,
+    new_seed: str,
+    url: str,
+    postgres_client: asyncpg.Connection,
+):
+    """
+    Updates a seed that's stored against an url in the database. The seeds are basically
+    the initial pages to crawl associated with that url.
+    """
+    # Get the current array of seeds for the url
+    current_seeds = await postgres_client.fetchrow(
+        "SELECT seeds FROM seed_urls WHERE url = $1", url
+    )
+
+    # Get the current seeds list
+    current_seeds = current_seeds[0]
+
+    # Check if the seed is already in the array
+    if old_seed not in current_seeds:
+        return (False, "Seed not in array")
+
+    # Else get the current index of the old seed
+    old_index = current_seeds.index(old_seed)
+
+    # And replace it with the new one
+    current_seeds[old_index] = new_seed
+
+    try:
+        # Update the array in the database
+        await postgres_client.execute(
+            "UPDATE seed_urls SET seeds = $1 WHERE url = $2", current_seeds, url
+        )
+
+        return (True, "Seed updated successfully")
+
+    except Exception as e:
+        print("Failed to update url with error:", e)
+
+        return (False, f"Failed to update seed url with error: {e}")
+
+
 async def get_seed_urls(
     postgres_client: asyncpg.Connection,
 ) -> list[SeedUrl]:
