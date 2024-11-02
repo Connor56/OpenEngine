@@ -12,6 +12,10 @@
 	let adminLocation = 'seed-urls';
 	let selectedResource: Url = { url: '', faviconLocation: '', seeds: [] };
 	let loading = true;
+	let seedModal: boolean = false;
+	let currentSeed: string = '';
+	let seedEdit: boolean = false;
+	let urlIndex: number = 0;
 
 	function handleNav(event: Event) {
 		const target = event.target as HTMLElement;
@@ -68,6 +72,16 @@
 		// Update the selected url
 		selectedResource = coreResources[urlIndex];
 	}
+
+	/**
+	 * Adds a seed to the selected url in the postgres database.
+	 */
+	function handleSeedAdd() {
+		currentSeed = '';
+		seedEdit = false;
+		seedModal = true;
+	}
+
 </script>
 
 <container>
