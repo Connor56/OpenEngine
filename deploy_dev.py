@@ -5,6 +5,7 @@ import time
 import signal
 import asyncpg
 import asyncio
+import platform
 
 # ==============================================================
 # Start the PostgreSQL server
@@ -153,9 +154,18 @@ with open("static/env.json", "w") as f:
 # Start the frontend in dev mode
 # ==============================================================
 
+print("Starting frontend...")
+
+# Check if platform is windows
+platform_type = platform.system()
+
+# Get a boolean flag
+use_shell = platform_type == "Windows"
+
 # Start the frontend
 frontend_process = subprocess.Popen(
     ["npm", "run", "dev"],
+    shell=use_shell,
 )
 
 print(frontend_process.pid)
@@ -193,4 +203,10 @@ def handle_end(signal, frame):
 signal.signal(signal.SIGINT, handle_end)
 signal.signal(signal.SIGTERM, handle_end)
 
-fastapi_process.wait()
+try:
+    fastapi_process.wait()
+except KeyboardInterrupt:
+    print("Ending the process...")
+
+    # Windows workaround
+    handle_end(None, None)
