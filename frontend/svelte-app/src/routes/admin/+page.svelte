@@ -47,7 +47,7 @@
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer askldjklasdjf` // Add the Authorization header
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
 			}
 		});
 
