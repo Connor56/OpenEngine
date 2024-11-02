@@ -1,7 +1,9 @@
 <script lang="ts">
 	import AdminTopNav from '$lib/components/AdminTopNav.svelte';
 	import UrlPanel from '$lib/components/UrlPanel.svelte';
+	import SeedCard from '$lib/components/SeedCard.svelte';
 	import Button from '$lib/components/Button.svelte';
+	import SeedEditModal from '$lib/components/SeedEditModal.svelte';
 	import type { Url } from '$lib/types';
 	import { onMount } from 'svelte';
 
@@ -74,12 +76,42 @@
 					<h3>Seeds</h3>
 					<div class="resource-seeds">
 						{#each selectedResource.seeds as seed}
-							<div class="resource-seed">
-								<div class="resource-seed-name">{selectedResource.url}{seed}</div>
-							</div>
+							<SeedCard
+								{seed}
+								url={selectedResource.url}
+								on:delete={() => handleSeedDelete(seed)}
+								on:edit={() => {
+									seedModal = true;
+									currentSeed = seed;
+									seedEdit = true;
+									console.log(currentSeed);
+								}}
+							></SeedCard>
 						{/each}
+						{#if selectedResource.url !== ''}
+							<div class="button-container">
+								<button on:click={handleSeedAdd}>
+									<svg class="url-add" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+										<path
+											d="M24 16V32M16 24H32M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z"
+											stroke-width="4"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</button>
+							</div>
+						{/if}
 					</div>
 				</div>
+				{#if seedModal}
+					<SeedEditModal
+						url={selectedResource}
+						seed={currentSeed}
+						edit={seedEdit}
+						on:close={seedModalClose}
+					/>
+				{/if}
 			</div>
 		{:else if adminLocation === 'crawl'}
 			<div class="crawl-grid">
@@ -169,6 +201,28 @@
 		border-radius: 30px;
 		padding: 20px;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	}
+
+	button {
+		all: unset;
+		cursor: pointer;
+	}
+
+	.button-container {
+		display: flex;
+		justify-content: center;
+		margin-top: 40px;
+	}
+
+	.url-add {
+		fill: none;
+		width: 40px;
+		height: 40px;
+		stroke: #757575;
+	}
+
+	.url-add:hover {
+		stroke: #368aff;
 	}
 
 	container {
