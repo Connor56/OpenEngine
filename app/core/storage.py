@@ -340,6 +340,49 @@ async def update_seed_url(
         return False
 
 
+async def add_seed_to_url(
+    seed: str,
+    url: str,
+    postgres_client: asyncpg.Connection,
+):
+    """
+    Adds a seed to an url in the database.
+    """
+    # Get the current array of seeds for the url
+    current_seeds = await postgres_client.fetchrow(
+        "SELECT seeds FROM seed_urls WHERE url = $1", url
+    )
+
+    # Get the current seeds list
+    current_seeds = current_seeds[0]
+
+    # Replace a None value with an empty list
+    if current_seeds is None:
+        current_seeds = []
+
+    # Check if the seed is already in the array
+    if seed in current_seeds:
+        print("Seed already in array:", seed)
+        return False
+
+    # Else add the seed to the array
+    current_seeds.append(seed)
+
+    try:
+        # Update the array in the database
+        await postgres_client.execute(
+            "UPDATE seed_urls SET seeds = $1 WHERE url = $2", current_seeds, url
+        )
+
+        return True
+
+    # If this fails for some reason, print the exception
+    except Exception as e:
+        print("Failed to update url with error:", e)
+
+        return False
+
+
 async def get_seed_urls(
     postgres_client: asyncpg.Connection,
 ) -> list[SeedUrl]:
