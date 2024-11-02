@@ -45,3 +45,14 @@ class UrlUpdateData(BaseModel):
 class CrawlData(BaseModel):
     regex: Optional[List[str]]
     max_iter: Optional[int]
+
+
+class SeedUpdateData(BaseModel):
+    url: str
+    new_seed: str
+    old_seed: str
+
+
+class SeedAddDeleteData(BaseModel):
+    url: str
+    seed: str
