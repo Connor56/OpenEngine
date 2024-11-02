@@ -40,7 +40,8 @@
 					Authorization: `Bearer ${localStorage.getItem('token')}`
 				},
 				body: JSON.stringify({
-					url: newUrl
+					url: newUrl,
+					seeds: []
 				})
 			});
 		}
