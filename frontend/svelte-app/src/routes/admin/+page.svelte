@@ -82,6 +82,32 @@
 		seedModal = true;
 	}
 
+	/**
+	 * Deletes a seed from the selected url in the postgres database.
+	 * @param seed The name of the seed to delete from the database.
+	 */
+	async function handleSeedDelete(seed: string) {
+		// Call the API to delete the seed
+		const response = await fetch(`${API_URL}/delete-seed-from-url`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
+			},
+			body: JSON.stringify({
+				url: selectedResource.url,
+				seed: seed
+			})
+		});
+
+		console.log(await response.json());
+
+		// Reload the urls
+		await reloadUrls();
+
+		// Update the selected url
+		selectedResource = coreResources[urlIndex];
+	}
 </script>
 
 <container>
