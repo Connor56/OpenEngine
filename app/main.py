@@ -353,6 +353,27 @@ async def add_seed_to_url(
         return {"message": "Failed to add seed to url"}
 
 
+@app.post("/delete-seed-from-url")
+async def delete_seed_from_url(
+    seed_delete: SeedAddDeleteData,
+    token=Depends(oauth2_scheme),
+    postgres_client=Depends(get_postgres_client),
+):
+    """
+    Adds a seed to an url in the database.
+    """
+    check_auth(token)
+
+    # Add the seed to the url in the database
+    result = await storage.delete_seed_from_url(
+        seed_delete.seed,
+        seed_delete.url,
+        postgres_client,
+    )
+
+    return {"message": result[1]}
+
+
 @app.post("/start-crawl", response_model=CrawlToken)
 async def start_crawl(
     crawl_data: CrawlData,
