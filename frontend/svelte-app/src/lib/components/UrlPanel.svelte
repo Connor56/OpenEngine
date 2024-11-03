@@ -10,7 +10,7 @@
 	export let coreResources: Url[];
 	export let handleSelect: (index: number) => void;
 
-	console.log(selectedResource);
+	console.log(coreResources);
 
 	const dispatch = createEventDispatcher();
 
