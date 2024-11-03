@@ -13,6 +13,7 @@ from qdrant_client.models import ScoredPoint
 from typing import List, Dict, Any
 import numpy as np
 import asyncpg
+from app.models.data_types import Result
 
 
 async def get_top_matches(
@@ -44,7 +45,32 @@ async def get_top_matches(
     # Order the urls by summed score
     top_urls = sorted(urls.items(), key=lambda x: x[1], reverse=True)
 
-    return top_urls[:match_limit]
+    # Reduce the returned urls to the match limit
+    top_urls = top_urls[:match_limit]
+
+    # Get the url strings for searching
+    top_url_strings = [url for url, _ in top_urls]
+
+    # Get the extra metadata
+    url_meta = await postgres_client.fetch(
+        "SELECT * FROM resources WHERE url = Any($1::text[])", top_url_strings
+    )
+
+    # Add the metadata to the results and return
+    top_urls = [
+        Result(
+            title="",
+            siteName="",
+            url=url[0],
+            snippet="",
+            score=url[1],
+            faviconLocation="",
+            published="",
+        )
+        for url in top_urls
+    ]
+
+    return top_urls
 
 
 async def fetch_matches(
