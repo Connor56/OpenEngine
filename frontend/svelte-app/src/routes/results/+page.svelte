@@ -33,7 +33,8 @@
 			const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}`);
 			if (response.ok) {
 				const data = await response.json();
-				results = data.results;
+				console.log(data);
+				results = data;
 			} else {
 				console.error('Error fetching results');
 			}
