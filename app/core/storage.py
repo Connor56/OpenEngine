@@ -216,6 +216,7 @@ async def add_potential_url(
 
 async def add_seed_url(
     url: str,
+    seeds: List[str],
     db_client: asyncpg.Connection,
 ) -> bool:
     """
@@ -241,13 +242,13 @@ async def add_seed_url(
         return False
 
     # Create a tuple of the resource's attributes
-    attributes = (url,)
+    attributes = (url, seeds)
 
     # Log the resource to the database
     try:
 
         await db_client.execute(
-            "INSERT INTO seed_urls (url) VALUES ($1)",
+            "INSERT INTO seed_urls (url, seeds) VALUES ($1, $2)",
             *attributes,
         )
 
