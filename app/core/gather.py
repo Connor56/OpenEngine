@@ -84,9 +84,18 @@ async def gather(
     # Get the Seed urls
     seed_urls = await get_seed_urls(db_client)
 
-    seed_urls = [url.url for url in seed_urls]
+    # Make all the url + seed combinations to search
+    urls_to_search = [url.url + seed for url in seed_urls for seed in url.seeds]
 
-    # Get all the urls from the postgres database
+    # Get the base seed urls for regex
+    base_urls = [url.url for url in seed_urls]
+
+    # Add them to the search list
+    urls_to_search += base_urls
+
+    print("urls to search:", urls_to_search)
+
+    # Get all the urls already visited from the postgres database
     all_urls = await db_client.fetch("SELECT url, lastVisited FROM resources")
 
     # Filter out the urls to be revisited
@@ -95,12 +104,12 @@ async def gather(
         url[0] for url in all_urls if current_time - url[1] > revisit_delta
     ]
 
-    retry_urls += seed_urls
+    urls_to_search += retry_urls
 
     print("retry urls:", retry_urls)
 
     # Add the retry urls to the url queue
-    for url in retry_urls:
+    for url in urls_to_search:
         await url_queue.put(url)
 
     print("url queue:", url_queue.qsize())
@@ -132,7 +141,7 @@ async def gather(
         "filter_func": pattern_filter,
         "kwargs": {
             "regex_patterns": (
-                retry_urls if regex_patterns is None else regex_patterns
+                base_urls if regex_patterns is None else regex_patterns
             ),
         },
     }
