@@ -6,6 +6,8 @@ import signal
 import asyncpg
 import asyncio
 import platform
+import qdrant_client
+from qdrant_client.models import VectorParams, Distance
 
 # ==============================================================
 # Start the PostgreSQL server
@@ -102,6 +104,7 @@ subprocess.run(["docker", "stop", qdrant_name])
 # Remove it from docker
 subprocess.run(["docker", "rm", qdrant_name])
 
+
 # Start the server in memory
 qdrant_process = subprocess.run(
     [
@@ -115,6 +118,13 @@ qdrant_process = subprocess.run(
         "qdrant/qdrant",
     ],
 )
+# qdrant = qdrant_client.QdrantClient(host="localhost", port=6333)
+# created = qdrant.create_collection(
+#     collection_name="embeddings",
+#     vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+# )
+
+# print("Embeddings collection created:", created)
 
 time.sleep(2)
 
