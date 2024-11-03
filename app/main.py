@@ -25,7 +25,9 @@ from app.models.data_types import (
     SeedUpdateData,
     SeedAddDeleteData,
     UrlDeleteData,
+    Result,
 )
+from app.core.search import get_top_matches
 from dotenv import load_dotenv
 import asyncpg
 from qdrant_client import AsyncQdrantClient
@@ -174,6 +176,27 @@ def check_auth(token: str):
             detail="Invalid credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+@app.get("/search", response_model=list[Result])
+async def search(
+    query: str,
+    postgres_client=Depends(get_postgres_client),
+    qdrant_client=Depends(get_qdrant_client),
+    embedding_model=Depends(get_embedding_model),
+):
+    """
+    Searches the qdrant database for the query and returns results.
+    """
+
+    print(query)
+
+    # Get the search results
+    results = await get_top_matches(
+        query, embedding_model, qdrant_client, postgres_client
+    )
+
+    return results
 
 
 @app.post("/login", response_model=Token)
