@@ -43,15 +43,17 @@
 		}
 	}
 
-	const handleKeyPress = (event: KeyboardEvent) => {
+	const handleKeyPress = async (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
-			alert('you pressed enter');
+			console.log('you pressed enter');
+			console.log(results);
+			await fetchResults();
 		}
 	};
 </script>
 
 <div class="top-bar horizontal-alignment">
-	<SearchBar {handleKeyPress} {query} />
+	<SearchBar {handleKeyPress} bind:query />
 </div>
 <hr />
 
