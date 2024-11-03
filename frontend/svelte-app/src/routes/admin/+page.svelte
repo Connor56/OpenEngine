@@ -108,6 +108,25 @@
 		// Update the selected url
 		selectedResource = coreResources[urlIndex];
 	}
+
+	/**
+	 * Starts a crawl.
+	 */
+	async function handleStartCrawl() {
+		// Send a start crawl request to the API
+		const response = await fetch(`${API_URL}/start-crawl`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
+			},
+			body: JSON.stringify({})
+		});
+
+		// For debugging
+		console.log(await response.json());
+	}
+
 </script>
 
 <container>
@@ -182,7 +201,7 @@
 						label="Start Crawl"
 						color="#28b828"
 						hoverBackgroundColor="#28b828"
-						handleClick={() => alert('start crawl')}
+						handleClick={() => handleStartCrawl()}
 					/>
 					<Button
 						label="Stop Crawl"
