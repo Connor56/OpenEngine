@@ -59,8 +59,8 @@ postgres_client = None
 qdrant_client = None
 
 # Global crawl events
-crawl_pause = None
-crawl_end = None
+crawl_pause: asyncio.Event = None
+crawl_end: asyncio.Event = None
 
 
 @asynccontextmanager
