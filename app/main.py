@@ -24,6 +24,7 @@ from app.models.data_types import (
     CrawlData,
     SeedUpdateData,
     SeedAddDeleteData,
+    UrlDeleteData,
 )
 from dotenv import load_dotenv
 import asyncpg
@@ -288,7 +289,7 @@ async def add_seed_url(
 
 @app.post("/delete-seed-url")
 async def delete_seed_url(
-    url: SeedUrl,
+    url: UrlDeleteData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
 ):
