@@ -60,3 +60,13 @@ class SeedUpdateData(BaseModel):
 class SeedAddDeleteData(BaseModel):
     url: str
     seed: str
+
+
+class Result(BaseModel):
+    title: str
+    siteName: str
+    url: str
+    snippet: str
+    score: float
+    faviconLocation: str
+    published: str
