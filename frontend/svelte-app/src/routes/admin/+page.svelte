@@ -127,6 +127,23 @@
 		console.log(await response.json());
 	}
 
+	/**
+	 * Stops a crawl.
+	 */
+	async function handleStopCrawl() {
+		// Send a stop crawl request to the API
+		const response = await fetch(`${API_URL}/stop-crawl`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
+			},
+			body: JSON.stringify({})
+		});
+
+		// For debugging
+		console.log(await response.json());
+	}
 </script>
 
 <container>
@@ -207,7 +224,7 @@
 						label="Stop Crawl"
 						color="#b82828"
 						hoverBackgroundColor="#b82828"
-						handleClick={() => alert('stop crawl')}
+						handleClick={() => handleStopCrawl()}
 					/>
 					<Button
 						label="Pause Crawl"
