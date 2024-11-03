@@ -23,6 +23,10 @@ class SeedUrl(BaseModel):
     seeds: list[str] | None
 
 
+class UrlDeleteData(BaseModel):
+    url: str
+
+
 class CrawledUrl(BaseModel):
     url: str
     firstVisited: datetime
