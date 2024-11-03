@@ -390,7 +390,6 @@ async def delete_seed_from_url(
 
 @app.post("/start-crawl", response_model=CrawlToken)
 async def start_crawl(
-    crawl_data: CrawlData,
     token=Depends(oauth2_scheme),
     postgres_client=Depends(get_postgres_client),
     qdrant_client=Depends(get_qdrant_client),
@@ -400,8 +399,6 @@ async def start_crawl(
     Start the url crawling process.
     """
     check_auth(token)
-
-    print("crawl data:", crawl_data)
 
     # Set up the events for starting and stopping the crawler
     pause = asyncio.Event()
@@ -420,8 +417,6 @@ async def start_crawl(
             qdrant_client,
             postgres_client,
             embedding_model,
-            max_iter=crawl_data.max_iter,
-            regex_patterns=crawl_data.regex,
             pause=pause,
             end=end,
         )
