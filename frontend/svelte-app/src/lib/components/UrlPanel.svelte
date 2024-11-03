@@ -47,8 +47,10 @@
 	}
 
 	function modalClose() {
+		// Close the modals
 		showModal = false;
 		showDeleteModal = false;
+
 		dispatch('close');
 	}
 </script>
