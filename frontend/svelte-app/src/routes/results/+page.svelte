@@ -6,31 +6,7 @@
 	import ResultCard from '$lib/components/ResultCard.svelte';
 
 	let query: string | null = '';
-
-	let results: Result[] = [
-		{
-			title: 'Example Title',
-			siteName: 'Example Site Name',
-			url: 'https://example.com',
-			snippet:
-				'This url will take you to places you could never even imagine, its a place where you can be yourself and be free.',
-			score: 0.5,
-			faviconLocation: 'github.webp',
-			published: '01 July 2020'
-		},
-		{
-			title: 'wing wong ding dong',
-			siteName: 'The place od darkness',
-			url: 'https://example.co',
-			snippet:
-				'This url will take you to places you could never even imagine, its a place where you can be yourself and be free.',
-			score: 0.4,
-			faviconLocation: 'favicon.png',
-			published: '01 July 2023'
-		}
-	];
-
-	results = [];
+	let results: Result[] = [];
 
 	let API_URL: string = '';
 
