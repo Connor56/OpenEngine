@@ -5,14 +5,14 @@
 	import type { Result } from '$lib/types';
 	import ResultCard from '$lib/components/ResultCard.svelte';
 
-	let query: string | null = '';
+	let query: string = '';
 	let results: Result[] = [];
 
 	let API_URL: string = '';
 
 	onMount(async () => {
 		// Get query parameter from the URL
-		query = $page.url.searchParams.get('query');
+		query = $page.url.searchParams.get('query')!;
 
 		// Load the environment variables
 		let response = await fetch('/env.json');
