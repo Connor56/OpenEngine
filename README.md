@@ -1,9 +1,8 @@
 # OpenEngine
 
-OpenEngine is a web crawler and search engine that uses the [Qdrant](https://qdrant.tech/) vector database to store and search for websites. It is designed to conquer the niches of the internet. One man can't compete with the scale of the
-tech elite. But scale gives rise to its own problems. For example, Google's algorithm is consistently gamed by marketing firms who but terrible blog content at the top of every search. Truly interesting, unique, and valuable information is lost in a sea of regurgitated bullshit noise.
+OpenEngine is a web crawler and search engine that uses the [Qdrant](https://qdrant.tech/) vector database to store and search for websites. It is designed to conquer the niches of the internet. One man can't compete with the scale of the tech elite. But scale gives rise to its own problems. For example, Google's algorithm is consistently gamed by marketing firms that put terrible blog content at the top of every search. Truly interesting, unique, and valuable information is lost in a sea of regurgitated bullshit noise.
 
-Step in OpenEngine. OpenEngine is designed to be run on a cheap, small docker container in the cloud. It is not designed serve billions of requests a day, but to let interested individuals build their own curated indexes in niches they find cool and serve that information to their community as a service.
+Step in OpenEngine. OpenEngine is designed to be run on a cheap, small docker container in the cloud. It is not designed to serve billions of requests a day, but to let interested individuals build their own curated indexes in niches they find cool and serve that information to their community as a service.
 
 # Deployment
 
