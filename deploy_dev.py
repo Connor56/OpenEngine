@@ -286,8 +286,6 @@ with open("static/env.json", "w") as f:
 # Start the frontend in dev mode
 # ==============================================================
 
-print("Starting frontend...")
-
 # Check if platform is windows
 platform_type = platform.system()
 
@@ -298,6 +296,7 @@ frontend_process = None
 
 # Start the frontend
 if args.frontend:
+    print("Starting frontend...")
     frontend_process = subprocess.Popen(
         ["npm", "run", "dev"],
         shell=use_shell,
