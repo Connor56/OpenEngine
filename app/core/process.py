@@ -132,6 +132,8 @@ async def process(
 
                 await log_resource(resource, db_client)
 
+    return None
+
 
 async def process_html_to_vectors(
     soup: BeautifulSoup,
