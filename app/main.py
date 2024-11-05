@@ -37,6 +37,7 @@ from fastapi.responses import HTMLResponse
 import asyncio
 import app.core.gather as gather
 import sentence_transformers
+import uuid
 
 # Get the files containing directory
 containing_dir = os.path.dirname(__file__)
@@ -63,6 +64,9 @@ qdrant_client = None
 # Global crawl events
 crawl_pause: asyncio.Event = None
 crawl_end: asyncio.Event = None
+
+# Global stream token
+stream_token: str = None
 
 
 @asynccontextmanager
@@ -141,6 +145,21 @@ async def get_crawl_end():
     """
     global crawl_end
     return crawl_end
+
+
+
+
+async def get_stream_token():
+    """
+    Returns the global stream token, setting up a new one if it's currently
+    None.
+    """
+    global stream_token
+
+    if stream_token is None:
+        stream_token = uuid.uuid4().hex
+
+    return stream_token
 
 
 async def check_token(token: str = Depends(oauth2_scheme)):
