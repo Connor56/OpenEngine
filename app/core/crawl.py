@@ -17,6 +17,7 @@ from urllib.parse import urlparse, urlunparse
 from .process import Response
 from .utility import get_base_site, clean_urls, handle_relative_url
 from app.models.app_types import AsyncList
+import time
 
 
 def pattern_filter(
@@ -37,7 +38,7 @@ def pattern_filter(
                 filtered_urls.append(url)
                 break
 
-    print("these are the filtered urls:", filtered_urls)
+    # print("these are the filtered urls:", filtered_urls)
     return filtered_urls
 
 
@@ -50,6 +51,7 @@ async def crawler(
     end: asyncio.Event,
     seen_urls: Optional[AsyncList] = [],
     max_iter: Optional[int] = -1,
+    message_queue: Optional[asyncio.Queue] = None,
 ) -> None:
     """
     Simple asynchronous crawling function that continuously reads
@@ -86,9 +88,11 @@ async def crawler(
 
     max_iter : int, optional
         The maximum number of iterations to run the crawler for.
+
+    message_queue : asyncio.Queue, optional
+        The queue used by the crawler to stream messages back to the client, if provided.
     """
     num_iter = 0
-    print("max_iter:", max_iter)
     while True:
         # Crawler ended?
         if end.is_set():
@@ -99,12 +103,14 @@ async def crawler(
             # Clear the pause event
             pause.clear()
 
-            print("paused crawler", flush=True)
+            await message_queue.put(
+                f"Crawler: paused crawler, waiting for resume signal..."
+            )
 
             # Wait until it's set again
             await pause.wait()
 
-            print("resumed crwaler", flush=True)
+            await message_queue.put(f"Crawler: Crawler resumed, continuing crawling...")
 
             # Then clear it again this implements a toggle
             pause.clear()
@@ -120,6 +126,7 @@ async def crawler(
         url_queue.task_done()
 
         print("\n\nurl:", url)
+        await message_queue.put(f"Crawler: crawling url: {url}")
 
         soup = None
         response = await client.get(url, timeout=7)
@@ -137,9 +144,11 @@ async def crawler(
             response_queue.put_nowait(response)
 
         else:
-            print("failed to get response for url:", url)
-            print(response)
-            print("skipping...")
+            await message_queue.put_nowait(
+                f"Crawler: failed to get response for url: {url}"
+            )
+            await message_queue.put(f"Crawler: Response was: {response}")
+            await message_queue.put("Crawler: skipping...")
             continue
 
         # Get all links from the soup
@@ -177,3 +186,5 @@ async def crawler(
             if addable_url not in all_urls:
                 await url_queue.put(addable_url)
                 seen_urls.append(addable_url)
+
+    return None
