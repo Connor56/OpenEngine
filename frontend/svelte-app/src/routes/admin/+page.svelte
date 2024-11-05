@@ -144,6 +144,24 @@
 		// For debugging
 		console.log(await response.json());
 	}
+
+	/**
+	 * Pauses a crawl.
+	 */
+	async function handlePauseCrawl() {
+		// Send a pause crawl request to the API
+		const response = await fetch(`${API_URL}/toggle-crawl`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
+			},
+			body: JSON.stringify({})
+		});
+
+		// For debugging
+		console.log(await response.json());
+	}
 </script>
 
 <container>
@@ -230,7 +248,7 @@
 						label="Pause Crawl"
 						color="#d5890f"
 						hoverBackgroundColor="#d5890f"
-						handleClick={() => alert('pause crawl')}
+						handleClick={() => handlePauseCrawl()}
 					/>
 				</div>
 				<div class=""></div>
