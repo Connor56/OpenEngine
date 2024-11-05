@@ -81,6 +81,7 @@ async def lifespan(app: FastAPI):
     """
     global postgres_client
     global qdrant_client
+    global crawl_message_queue
 
     print(os.getenv("POSTGRES_USER"))
 
@@ -100,6 +101,10 @@ async def lifespan(app: FastAPI):
     )
 
     yield
+
+    # Close the crawl message queue
+    if crawl_message_queue is not None:
+        del crawl_message_queue
 
 
 # Set up the FastAPI app with lifespan
