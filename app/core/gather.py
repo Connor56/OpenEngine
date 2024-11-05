@@ -167,5 +167,5 @@ async def gather(
     )
 
     # Wait for the process coroutine to finish
-    await process_task
-    await crawler_task
+    print("waiting for process and crawler tasks", flush=True)
+    await asyncio.gather(process_task, crawler_task)
