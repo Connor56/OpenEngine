@@ -27,6 +27,7 @@ async def gather(
     model: sentence_transformers.SentenceTransformer,
     pause: asyncio.Event,
     end: asyncio.Event,
+    message_queue: Optional[asyncio.Queue] = None,
     revisit_delta: Optional[datetime.timedelta] = datetime.timedelta(days=1),
     max_iter: Optional[int] = -1,
     regex_patterns: Optional[List[str]] | None = None,
@@ -53,6 +54,9 @@ async def gather(
 
     end : asyncio.Event
         Ends the crawler's while loop.
+
+    message_queue : asyncio.Queue, optional
+        The queue used by the crawler to stream messages back to the client, if provided.
 
     revisit_delta : datetime.timedelta, optional
         The delta to use for revisiting a resource. Defaults to 1 day.
@@ -131,6 +135,7 @@ async def gather(
             pause,
             end,
             max_iter=max_iter,
+            message_queue=message_queue,
         )
     )
 
@@ -157,6 +162,7 @@ async def gather(
             end=end,
             seen_urls=seen_urls,
             max_iter=max_iter,
+            message_queue=message_queue,
         )
     )
 
