@@ -417,6 +417,8 @@ async def start_crawl(
     postgres_client=Depends(get_postgres_client),
     qdrant_client=Depends(get_qdrant_client),
     embedding_model=Depends(get_embedding_model),
+    crawl_message_queue=Depends(get_crawler_message_queue),
+    stream_token=Depends(get_stream_token),
 ):
     """
     Start the url crawling process.
@@ -426,6 +428,8 @@ async def start_crawl(
     # Set up the events for starting and stopping the crawler
     pause = asyncio.Event()
     end = asyncio.Event()
+
+    print("stream token:", stream_token, flush=True)
 
     # Set the global variables for the crawler
     global crawl_pause
@@ -442,10 +446,11 @@ async def start_crawl(
             embedding_model,
             pause=pause,
             end=end,
+            message_queue=crawl_message_queue,
         )
     )
 
-    return {"message": "Crawl started successfully", "streamToken": None}
+    return {"message": "Crawl started successfully", "streamToken": stream_token}
 
 
 @app.post("/stop-crawl")
