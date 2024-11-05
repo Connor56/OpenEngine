@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.responses import StreamingResponse
 import jwt
 from typing import Optional
 import app.auth.auth as auth
@@ -322,6 +323,56 @@ async def get_admin(
     check_auth(token)
 
     return HTMLResponse(content=page)
+
+
+async def message_stream():
+    """
+    Async message function that returns a stream of messages from the crawler until the
+    crawler ends.
+    """
+    global crawl_message_queue
+    global crawl_end
+
+    # If the crawl message queue is None, return no messages
+    if crawl_message_queue is None:
+        yield "data: No messages available\n\n"
+        return
+
+    # Else get the next message from the queue
+    while True:
+        # If the crawler has ended, exit the while loop
+        if crawl_end.is_set():
+            break
+
+        # Get the next message from the queue
+        message = await crawl_message_queue.get()
+        crawl_message_queue.task_done()
+
+        # Yield it to the client
+        yield f"data: {message}\n\n"
+
+    return
+
+
+@app.get("/stream")
+async def stream_messages(
+    token: str,
+    stream_token: str = Depends(get_stream_token),
+):
+    """
+    Endpoint to stream messages using server-sent events, checks the token to make sure
+    it's valid for the crawl.
+    """
+    if token != stream_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    print("Credentials are okay.")
+
+    return StreamingResponse(message_stream(), media_type="text/event-stream")
 
 
 @app.post("/add-seed-url")
