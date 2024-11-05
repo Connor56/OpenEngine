@@ -65,6 +65,9 @@ qdrant_client = None
 crawl_pause: asyncio.Event = None
 crawl_end: asyncio.Event = None
 
+# Global crawl message queue
+crawl_message_queue: asyncio.Queue = None
+
 # Global stream token
 stream_token: str = None
 
@@ -147,6 +150,17 @@ async def get_crawl_end():
     return crawl_end
 
 
+async def get_crawler_message_queue():
+    """
+    Returns the global crawler message queue, setting up a new one if it's currently
+    None.
+    """
+    global crawl_message_queue
+
+    if crawl_message_queue is None:
+        crawl_message_queue = asyncio.Queue()
+
+    return crawl_message_queue
 
 
 async def get_stream_token():
