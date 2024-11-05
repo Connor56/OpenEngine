@@ -548,7 +548,20 @@ async def stop_crawl(
     """
     check_auth(token)
 
+    # End the crawl by calling the asyncio event
     crawl_end.set()
+
+    global crawl_message_queue
+    global stream_token
+
+    # Wait for the message queue to be empty
+    await crawl_message_queue.join()
+
+    # Then set it to None ready to be reused
+    crawl_message_queue = None
+
+    # Set the stream token to None ready to be reused
+    stream_token = None
 
     return {"message": "Crawl stopped successfully"}
 
@@ -567,6 +580,7 @@ async def toggle_crawl(
 
     # Toggle the pause event
     crawl_pause.set()
+
     return {"message": "Crawl toggled successfully"}
 
 
