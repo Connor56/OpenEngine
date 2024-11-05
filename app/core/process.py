@@ -19,6 +19,7 @@ import asyncio
 import asyncpg
 from datetime import datetime
 from .utility import clean_urls, handle_relative_url, get_base_site
+import time
 
 
 @dataclass
@@ -37,6 +38,7 @@ async def process(
     pause: asyncio.Event,
     end: asyncio.Event,
     max_iter: Optional[int] = -1,
+    message_queue: Optional[asyncio.Queue] = None,
 ):
     """
     Processes responses collected by the crawler, turning them into
@@ -53,12 +55,12 @@ async def process(
             # Clear the pause event
             pause.clear()
 
-            print("paused process", flush=True)
+            await message_queue.put("Processor: paused process")
 
             # Wait until it's set again
             await pause.wait()
 
-            print("resumed process", flush=True)
+            await message_queue.put("Processor: resumed process")
 
             # Then clear it again this implements a toggle
             pause.clear()
@@ -75,8 +77,17 @@ async def process(
         if response.type == "webpage":
             soup = response.soup
 
+            await message_queue.put(
+                "Processor: processing webpage into vectors and meta..."
+            )
+            start_time = time.time()
+
             # Process webpage
             vectors, metadata = await process_html_to_vectors(soup, model)
+
+            await message_queue.put(
+                f"Processor: finished processing webpage into vectors and meta in {time.time() - start_time} seconds"
+            )
 
             metadata["url"] = response.url
 
