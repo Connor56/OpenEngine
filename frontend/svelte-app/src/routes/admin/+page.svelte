@@ -16,6 +16,7 @@
 	let currentSeed: string = '';
 	let seedEdit: boolean = false;
 	let urlIndex: number = 0;
+	let crawlMessages: string[] = [];
 
 	function handleNav(event: Event) {
 		const target = event.target as HTMLElement;
@@ -123,8 +124,64 @@
 			body: JSON.stringify({})
 		});
 
-		// For debugging
-		console.log(await response.json());
+		const responseData = await response.json();
+
+		// Start streaming output from the crawl
+		connectToStream(responseData.streamToken);
+
+		// For debugging the response
+		console.log(responseData);
+	}
+
+	/**
+	 * Establishes a connection to the crawler stream.
+	 * @param token The token to use to authenticate connection to the stream.
+	 */
+	async function connectToStream(token: string) {
+		// Get an event source from the API
+		const eventSource = new EventSource(`${API_URL}/stream?token=${token}`);
+
+		// Every time a message is received, add it to the crawlMessages array
+		eventSource.onmessage = function (event) {
+			console.log(event);
+			crawlMessages = [...crawlMessages, event.data];
+			console.log(crawlMessages);
+		};
+
+		// If there's an error, close the connection and register the stream as ended
+		eventSource.onerror = function (err) {
+			eventSource.close();
+
+			console.log(err);
+
+			crawlMessages = [...crawlMessages, 'END OF STREAM'];
+		};
+	}
+
+	/**
+	 * Establishes a connection to the crawler stream.
+	 */
+	async function connectToStream2() {
+		// Get an event source from the API
+		const response = await fetch(`${API_URL}/stream`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('token')}` // Add the Authorization header
+			}
+		});
+
+		const reader = response.body!.getReader();
+		const decoder = new TextDecoder('utf-8');
+
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			const message = decoder.decode(value);
+			crawlMessages = [...crawlMessages, message];
+			console.log(crawlMessages);
+			console.log(message);
+		}
 	}
 
 	/**
@@ -229,6 +286,11 @@
 				</div>
 				<div class="crawl-tracking-pane standard-pane">
 					<h2>Tracker</h2>
+					<div class="crawl-messages">
+						{#each crawlMessages as message}
+							<p>{message}</p>
+						{/each}
+					</div>
 				</div>
 				<div class="crawl-control-pane standard-pane">
 					<h2>Controls</h2>
