@@ -185,6 +185,6 @@ async def crawler(
             # Check it hasn't already been seen
             if addable_url not in all_urls:
                 await url_queue.put(addable_url)
-                seen_urls.append(addable_url)
+                await seen_urls.append(addable_url)
 
     return None
