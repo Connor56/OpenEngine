@@ -122,10 +122,12 @@ async def crawler(
             num_iter += 1
 
         # Get next url
+        print(url_queue.qsize())
         url = await url_queue.get()
         url_queue.task_done()
 
-        print("\n\nurl:", url)
+        print(f"Crawling {url}")
+
         await message_queue.put(f"Crawler: crawling url: {url}")
 
         soup = None
