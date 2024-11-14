@@ -4,6 +4,7 @@
 
 	export let url: Url;
 	export let seed: string;
+	export let timeBetweenVisits: number;
 	export let edit: boolean;
 
 	let API_URL: string;
@@ -30,7 +31,8 @@
 				body: JSON.stringify({
 					url: url.url,
 					new_seed: newSeed,
-					old_seed: seed
+					old_seed: seed,
+					timeBetweenVisits: timeBetweenVisits
 				})
 			});
 		} else {
@@ -43,7 +45,8 @@
 				},
 				body: JSON.stringify({
 					url: url.url,
-					seed: newSeed
+					seed: newSeed,
+					timeBetweenVisits: timeBetweenVisits
 				})
 			});
 		}
@@ -90,6 +93,12 @@
 
 		<form on:submit|preventDefault={handleSubmit}>
 			<input type="text" name="seed" placeholder="Seed" value={seed} />
+			<input
+				type="number"
+				name="timeBetweenVisits"
+				placeholder="Seconds between visits"
+				value={timeBetweenVisits}
+			/>
 			<button type="submit" class="submit-button">Done</button>
 		</form>
 	</div>
