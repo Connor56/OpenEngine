@@ -103,55 +103,7 @@ if args.restart_containers or not postgres_exists:
 
         time.sleep(2)
 
-
-async def setup_postgres():
-    client = await asyncpg.connect(
-        user="postgres", password="postgres", host="localhost", port=5432
-    )
-
-    print("connected to postgres")
-
-    # Create the resource table
-    resources_sql = """CREATE TABLE resources ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        firstVisited TIMESTAMP NOT NULL,
-        lastVisited TIMESTAMP NOT NULL,
-        allVisits INT DEFAULT 1,
-        externalLinks TEXT[]
-    );"""
-
-    await client.execute(resources_sql)
-
-    # Create the admin table
-    admins_sql = """CREATE TABLE admins ( 
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(2048) NOT NULL,
-        password VARCHAR(2048) NOT NULL
-    );"""
-
-    await client.execute(admins_sql)
-
-    # Create the seed urls table
-    seed_urls_sql = """CREATE TABLE seed_urls ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        seeds VARCHAR(512)[]
-    );"""
-
-    await client.execute(seed_urls_sql)
-
-    potential_urls_sql = """CREATE TABLE potential_urls ( 
-        id SERIAL PRIMARY KEY,
-        url VARCHAR(2048) NOT NULL,
-        firstSeen TIMESTAMP NOT NULL,
-        timesSeen INT DEFAULT 1
-    );"""
-
-    await client.execute(potential_urls_sql)
-
-    print("added all tables")
-
+from setup import setup_postgres
 
 # Add the embeddings collection if they've been restarted
 if args.restart_containers:
@@ -166,12 +118,12 @@ if not postgres_exists and not postgres_stopped:
 # Start the qdrant server
 # ==============================================================
 
+from setup import setup_qdrant
+
 qdrant_name = "dev-qdrant"
 
 # Check if the qdrant container exists
-qdrant_exists = (
-    len(docker_client.containers.list(filters={"name": "dev-qdrant"})) > 0
-)
+qdrant_exists = len(docker_client.containers.list(filters={"name": "dev-qdrant"})) > 0
 
 # Shutdown any pre-existing container
 if args.restart_containers:
@@ -221,23 +173,13 @@ if args.restart_containers or not qdrant_exists:
 
 # Add the embeddings collection if the containers have been restarted
 if args.restart_containers:
-    created = qdrant.create_collection(
-        collection_name="embeddings",
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
-    )
-
-    print("Embeddings collection created:", created)
+    asyncio.run(setup_qdrant(qdrant))
 
     time.sleep(2)
 
 # Add the embeddings collection if the containers have been initially created
 if not qdrant_exists and not qdrant_stopped:
-    created = qdrant.create_collection(
-        collection_name="embeddings",
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
-    )
-
-    print("Embeddings collection created:", created)
+    asyncio.run(setup_qdrant(qdrant))
 
     time.sleep(2)
 
